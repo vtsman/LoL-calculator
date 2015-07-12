@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>WIP Build page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
-    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
     <script src="champion.js"></script>
     <link href="./global.css" media="all" rel="stylesheet" />
 </head>
@@ -14,17 +14,55 @@
             <div ng-if="champion.should_show()">
                 <div id="champion_header">
                     <!-- Size of image determined in style.js -->
-                    <img src="{{ champion.getChampion().icon }}" class="lol_icon" id="champion_icon">
+                    <img src="{{ 'https://ddragon.leagueoflegends.com/cdn/5.12.1/img/champion/' + champion.getChampion().image.full }}" class="lol_icon" id="champion_icon">
                     <div id="champion_header_text">
                         <div class="lol_title" id="champion_title">{{ champion.getChampion().name }}</div>
-                        <div class="lol_subtitle" id="champion_subtitle">{{ champion.getChampion().desc }}</div>
+                        <div class="lol_subtitle" id="champion_subtitle">{{ champion.getChampion().title }}</div>
                     </div>
                 </div>
+                <select id="champion_level" ng-click="apply()">
+                    <option ng-repeat="i in [] | range:18" value="{{ i }}">{{ "Level " + (i + 1) }}</option>
+                </select>
                 <div id="champion_stats">
                     <table id="champion_stats_table">
-                        <tr ng-repeat="(stat, value) in champion.getChampion().stats">
-                            <td>{{ value.name }}</td>
-                            <td>{{ value.base }}</td>
+                        <tr>
+                            <td>Armor</td>
+                            <td>{{ champion.getArmor() }}</td>
+                            <td id="table_space"></td>
+                            <td>Attack Damage</td>
+                            <td>{{ champion.getAD() }}</td>
+                        </tr>
+                        <tr>
+                            <td>Range</td>
+                            <td>{{ champion.getRange() }}</td>
+                            <td id="table_space"></td>
+                            <td>Attack Speed</td>
+                            <td>{{ champion.getAttackSpeed() }}</td>
+                        </tr>
+                        <tr>
+                            <td>Crit Chance</td>
+                            <td>{{ champion.getCritChance() }}</td>
+                            <td id="table_space"></td>
+                            <td>Health</td>
+                            <td>{{ champion.getHP() }}</td>
+                        </tr>
+                        <tr>
+                            <td>Health Regen</td>
+                            <td>{{ champion.getHPRegen() }}</td>
+                            <td id="table_space"></td>
+                            <td>Attack Speed</td>
+                            <td>{{ champion.getSpeed() }}</td>
+                        </tr>
+                        <tr>
+                            <td>Mana</td>
+                            <td>{{ champion.getMana() }}</td>
+                            <td id="table_space"></td>
+                            <td>Mana Regen</td>
+                            <td>{{ champion.getManaRegen() }}</td>
+                        </tr>
+                        <tr>
+                            <td>Magic Resist</td>
+                            <td>{{ champion.getMR() }}</td>
                         </tr>
                     </table>
                 </div>
