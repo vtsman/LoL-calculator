@@ -1,0 +1,38 @@
+div{
+    font-family: helvetica;
+}
+
+#champion_header{
+
+}
+
+#champion_icon{
+    float: left;
+}
+
+#champion_title{
+
+}
+
+#champion_header_text{
+    float: left;
+    padding-left: 10px;
+}
+
+#champion_stats{
+    clear: both;
+}
+
+#champion_stats_table{
+    padding: 5px;
+}
+
+.lol_title{
+    color: steelblue;
+    font-size: x-large;
+}
+
+.lol_subtitle{
+    color: darkgrey;
+    font-size: medium;
+}

@@ -1,0 +1,54 @@
+{
+  "name": "Teemo",
+  "code_name": "teemo",
+  "id": 123,
+  "desc": "The Swift Scout",
+  "icon": "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSCqc-PhPPSKBQOvubxE33x3fFwF5mbN22t00jsskaCXwWk1ZZW",
+  "stats":{
+    "health":{
+      "name": "Health",
+      "base": 515.76,
+      "scale": 82
+    },
+    "mana":{
+      "name": "Mana",
+      "base": 267.2,
+      "scale": 40
+    },
+    "ad":{
+      "name": "Attack Damage",
+      "base": 47.54,
+      "scale": 3
+    },
+    "attack_speed":{
+      "name": "Attack Speed",
+      "base": 0.69,
+      "scale": 0.0338
+    },
+    "speed":{
+      "name": "Speed",
+      "base": 330,
+      "scale": 0
+    },
+    "health_regen":{
+      "name": "Health Regeneration",
+      "base": 5.74,
+      "scale": 0.65
+    },
+    "mana_regen":{
+      "name": "Mana Regeneration",
+      "base": 7.205,
+      "scale": 0.45
+    },
+    "armor":{
+      "name": "Armor",
+      "base": 24.3,
+      "scale": 3.75
+    },
+    "mr":{
+      "name": "Magic Resist",
+      "base": 30,
+      "scale": 0
+    }
+  }
+}
