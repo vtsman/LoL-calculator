@@ -1,9 +1,45 @@
+::-webkit-input-placeholder {
+    text-align: center;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+    text-align: center;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+    text-align: center;
+}
+
+:-ms-input-placeholder {
+    text-align: center;
+}
+
+div::-webkit-scrollbar {
+    display: none;
+}
+
+body	{ background-attachment:fixed; }
+
 div{
     font-family: helvetica;
 }
 
-#champion_header{
+select{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 
+    padding: 5px;
+    border-radius: 3px;
+    border: none;
+
+    outline: rgba(128, 128, 128, .75);
+
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+#champion_header{
+    margin: 20px;
 }
 
 #champion_icon{
@@ -14,6 +50,77 @@ div{
 
 }
 
+#build_items{
+    position: relative;
+}
+
+#items_title{
+    text-align: center;
+}
+
+#divider{
+    clear: both;
+    height: 10px;
+}
+
+#item_popup{
+    border-radius: 10px;
+    width: 100%;
+    text-align: center
+}
+
+#item_search{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    margin: 5px;
+
+    border: none;
+
+    border-radius: 5px;
+
+    width: calc(100% - 10px);
+}
+
+.popup{
+    z-index: 100;
+    position: absolute;
+}
+
+.enabled.item{
+    z-index: 100;
+    position: absolute;
+}
+
+.item{
+    width: 48px;
+    height: 48px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.blank_item{
+    width: 48px;
+    height: 48px;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+.blur {
+    background-color: rgba(180, 180, 180, 0.7);
+}
+
+#build{
+    alignment: right;
+    float: right;
+}
+
+#champion_info{
+    float: left;
+    width: 50%;
+}
+
 #champion_header_text{
     float: left;
     padding-left: 10px;
@@ -21,18 +128,75 @@ div{
 
 #champion_stats{
     clear: both;
+    float: left;
+    margin: 20px;
+    padding: 10px;
+    border-radius: 10px;
 }
 
 #champion_stats_table{
     padding: 5px;
 }
 
+#champion_ability{
+    clear: both;
+}
+
+#spell_icon{
+    margin: 5px;
+    float: left;
+    height: 40px;
+    vertical-align: middle;
+    border-radius: 5px;
+}
+
+#champion_level{
+    vertical-align: top;
+}
+
+#ability_title{
+    float: left;
+}
+
+.ability_level{
+    vert-align: middle;
+    float: left;
+    margin: 5px;
+}
+
+#ability_desc{
+    clear: both;
+}
+
+#build_items_table{
+    margin: 10px;
+}
+
 .lol_title{
-    color: steelblue;
+    color: rgba(255, 255, 255, 0.9);
     font-size: x-large;
 }
 
 .lol_subtitle{
-    color: darkgrey;
+    color: #B1B1B1;
     font-size: medium;
+}
+
+.lol_content{
+    font-size: small;
+}
+
+.spell{
+    margin: 20px;
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.spell_content{
+    padding: 5px;
+}
+
+body{
+    background-color: #333333;
 }

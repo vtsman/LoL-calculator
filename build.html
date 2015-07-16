@@ -5,68 +5,118 @@
     <title>WIP Build page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://www.blurjs.com/blur.min.js"></script>
+    <script src="champion_calculator.js"></script>
     <script src="champion.js"></script>
     <link href="./global.css" media="all" rel="stylesheet" />
 </head>
-<body>
-    <div>
-        <div id="champion_info" ng-controller="ChampionController as champion">
-            <div ng-if="champion.should_show()">
+<body background="bg/2.jpg" ng-controller="CalculatorController as calculator">
+    <div ng-init="calculator.init()">
+        <div id="champion_info">
+            <div ng-if="calculator.should_show()">
                 <div id="champion_header">
                     <!-- Size of image determined in style.js -->
-                    <img src="{{ 'https://ddragon.leagueoflegends.com/cdn/5.12.1/img/champion/' + champion.getChampion().image.full }}" class="lol_icon" id="champion_icon">
+                    <img src="{{ calculator.getImage(calculator.getChampion().base.image) }}" class="lol_icon" id="champion_icon">
                     <div id="champion_header_text">
-                        <div class="lol_title" id="champion_title">{{ champion.getChampion().name }}</div>
-                        <div class="lol_subtitle" id="champion_subtitle">{{ champion.getChampion().title }}</div>
+                        <div class="lol_title" id="champion_title">{{ calculator.getChampion().base.name }}</div>
+                        <div class="lol_subtitle" id="champion_subtitle">{{ calculator.getChampion().base.title }}</div>
                     </div>
                 </div>
-                <select id="champion_level" ng-click="apply()">
+                <select id="champion_level" ng-click="calculator.set_level()">
                     <option ng-repeat="i in [] | range:18" value="{{ i }}">{{ "Level " + (i + 1) }}</option>
                 </select>
-                <div id="champion_stats">
+                <div id="champion_stats" class="blur">
                     <table id="champion_stats_table">
                         <tr>
                             <td>Armor</td>
-                            <td>{{ champion.getArmor() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getArmor()) }}</td>
                             <td id="table_space"></td>
                             <td>Attack Damage</td>
-                            <td>{{ champion.getAD() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getAD()) }}</td>
                         </tr>
                         <tr>
                             <td>Range</td>
-                            <td>{{ champion.getRange() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getRange()) }}</td>
                             <td id="table_space"></td>
                             <td>Attack Speed</td>
-                            <td>{{ champion.getAttackSpeed() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getAttackSpeed()) }}</td>
                         </tr>
                         <tr>
                             <td>Crit Chance</td>
-                            <td>{{ champion.getCritChance() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getCritChance()) * 100 + "%" }}</td>
                             <td id="table_space"></td>
                             <td>Health</td>
-                            <td>{{ champion.getHP() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getHP()) }}</td>
                         </tr>
                         <tr>
                             <td>Health Regen</td>
-                            <td>{{ champion.getHPRegen() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getHPRegen()) }}</td>
                             <td id="table_space"></td>
-                            <td>Attack Speed</td>
-                            <td>{{ champion.getSpeed() }}</td>
+                            <td>Speed</td>
+                            <td>{{ calculator.round(calculator.getChampion().getSpeed()) }}</td>
                         </tr>
                         <tr>
                             <td>Mana</td>
-                            <td>{{ champion.getMana() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getMana()) }}</td>
                             <td id="table_space"></td>
                             <td>Mana Regen</td>
-                            <td>{{ champion.getManaRegen() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getManaRegen()) }}</td>
                         </tr>
                         <tr>
                             <td>Magic Resist</td>
-                            <td>{{ champion.getMR() }}</td>
+                            <td>{{ calculator.round(calculator.getChampion().getMR()) }}</td>
+                            <td id="table_space"></td>
+                            <td>Ability Power</td>
+                            <td>{{ calculator.round(calculator.getChampion().getAP()) }}</td>
                         </tr>
                     </table>
                 </div>
+                <div id="divider"></div>
+                <div id="champion_ability" ng-repeat="spell in calculator.getChampion().getSpells()" class="spell blur">
+                    <img src="{{ calculator.getImage(spell.image) }}" class="lol_icon" id="spell_icon">
+                    <div id="{{ 'champion_ability_text_' + spell.name }}" class="spell_content">
+                        <div class="lol_title" id="ability_title">{{ spell.name }}</div>
+                        <select id="{{ 'ability_level_' + spell.key }}" class="ability_level" ng-click="apply()">
+                            <option ng-repeat="i in [] | range:spell.maxrank + 1" value="{{ i }}" ng-disabled="calculator.getChampion().get_points_used() + i > calculator.getChampion().getLevel() + 1">{{ i == 0?"Not Leveled":"Level " + (i) }}</option>
+                        </select>
+                        <div class="lol_content" id="ability_desc">{{ spell.parsed }}</div>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div id="build">
+            <div id="build_items">
+                <div class="lol_title" id="items_title">Items</div>
+                <table id="build_items_table">
+                    <tr>
+                        <td ng-repeat="item in calculator.getChampion().getItems().slice(0, 3) track by $index">
+                            <img ng-if="item != 0" class="item enabled" id="{{'item_img'+$index}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" title="{{calculator.items.data[item].name}}" onerror="this.src='notfound.png'" class="lol_icon item" ng-click="calculator.item_clicked($event)">
+                            <div class="blank_item blur" id="{{'item_button'+$index}}" ng-click="calculator.item_clicked($event)"></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td ng-repeat="item in calculator.getChampion().getItems().slice(3, 7) track by $index">
+                            <img ng-if="item != 0" class="item enabled" id="{{'item_img'+($index + 3)}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" title="{{calculator.items.data[item].name}}" onerror="this.src='notfound.png'" class="lol_icon item" ng-click="calculator.item_clicked($event)">
+                            <div class="blank_item blur" id="{{'item_button'+($index + 3)}}" ng-click="calculator.item_clicked($event)"></div>
+                        </td>
+                    </tr>
+                </table>
+                <div id="item_popup" class="blur popup" ng-hide="!calculator.should_show_item_popup()">
+                    <input type="text" id="item_search" placeholder="search" ng-model="search.item" ng-change="calculator.update_search()" align="center">
+                    <div id="tbl" style="overflow-y:scroll; height:300px;" align="center">
+                        <table id="item_search_results" ng-if="calculator.showSearch()">
+                            <tr ng-repeat="i in []| range:calculator.getItemSearchRows()">
+                                <td ng-repeat="item in calculator.getItemSearchRow(i)">
+                                    <img src="{{ calculator.getImage(calculator.items.data[item].image) }}" title="{{calculator.items.data[item].name}}" onerror="this.src='notfound.png'" class="lol_icon item" ng-click="calculator.item_click(item)">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!--div id="test_box">
+
+            </div-->
         </div>
     </div>
 </body>
