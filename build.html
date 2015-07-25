@@ -4,28 +4,55 @@
     <meta charset="UTF-8">
     <title>WIP Build page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.16/angular-animate.js"></script>
     <script src="http://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <script src="http://www.blurjs.com/blur.min.js"></script>
+    <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js'></script>
+    <script src="jquery.cssAnimateAuto.min.js"></script>
+    <script src="newblur.js"></script>
     <script src="champion_calculator.js"></script>
     <script src="champion.js"></script>
     <link href="./global.css" media="all" rel="stylesheet" />
 </head>
-<body background="bg/2.jpg" ng-controller="CalculatorController as calculator">
+<body ng-controller="CalculatorController as calculator">
     <div ng-init="calculator.init()">
         <div id="champion_info">
             <div ng-if="calculator.should_show()">
-                <div id="champion_header">
+                <div id="champion_header" class="blur">
                     <!-- Size of image determined in style.js -->
-                    <img src="{{ calculator.getImage(calculator.getChampion().base.image) }}" class="lol_icon" id="champion_icon">
+                    <img src="{{ calculator.getImage(calculator.getChampion().base.image) }}" class="lol_icon clickable" id="champion_icon" ng-click="calculator.champ_popup_toggle()">
                     <div id="champion_header_text">
                         <div class="lol_title" id="champion_title">{{ calculator.getChampion().base.name }}</div>
                         <div class="lol_subtitle" id="champion_subtitle">{{ calculator.getChampion().base.title }}</div>
                     </div>
+                    <div id="champ_popup_wrapper">
+                        <div id="champion_popup" class="popup light_blur" ng-hide="!calculator.should_show_champion_popup()">
+                            <input type="text" id="champion_search" class="search" placeholder="search" ng-model="search.champ" ng-change="calculator.update_champion_search()" align="center" spellcheck="false">
+                            <div id="tbl" class="scroll" align="center">
+                                <table id="champion_search_results" ng-if="calculator.showChampSearch()">
+                                    <tr ng-repeat="i in []| range:calculator.getChampSearchRows()">
+                                        <td ng-repeat="champ in calculator.getChampSearchRow(i)">
+                                            <img src="{{ calculator.getImage(champ.image) }}" onerror="this.src='notfound.png'" class="lol_icon champion clickable" ng-click="calculator.switchChamp(champ)" ng-mouseenter="calculator.setChampHover(champ)" ng-mouseleave="calculator.setChampHover(undefined)">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <select id="champion_level" ng-click="calculator.set_level()">
-                    <option ng-repeat="i in [] | range:18" value="{{ i }}">{{ "Level " + (i + 1) }}</option>
-                </select>
+                <div id="champion_tooltip" class="light_blur tooltip" ng-hide="!calculator.showChampTooltip()">
+                    <div id="tooltip_head_text">
+                        <div id="tooltip_title">{{calculator.getChampHover().name}}</div>
+                        <div id="tooltip_desc">{{calculator.getChampHover().title}}</div>
+                    </div>
+                    <br>
+                    <div id="tooltip_content" class="lol_content">
+                        {{calculator.items.data[calculator.getItemHover()].sanitizedDescription}}
+                    </div>
+                </div>
                 <div id="champion_stats" class="blur">
+                    <select id="champion_level" ng-click="calculator.set_level()">
+                        <option ng-repeat="i in [] | range:18" value="{{ i }}">{{ "Level " + (i + 1) }}</option>
+                    </select>
                     <table id="champion_stats_table">
                         <tr>
                             <td>Armor</td>
@@ -56,7 +83,7 @@
                             <td>{{ calculator.round(calculator.getChampion().getSpeed()) }}</td>
                         </tr>
                         <tr>
-                            <td>Mana</td>
+                            <td>{{calculator.getChampion().base.partype}}</td>
                             <td>{{ calculator.round(calculator.getChampion().getMana()) }}</td>
                             <td id="table_space"></td>
                             <td>Mana Regen</td>
@@ -74,10 +101,10 @@
                 <div id="divider"></div>
                 <div id="champion_ability" ng-repeat="spell in calculator.getChampion().getSpells()" class="spell blur">
                     <img src="{{ calculator.getImage(spell.image) }}" class="lol_icon" id="spell_icon">
-                    <div id="{{ 'champion_ability_text_' + spell.name }}" class="spell_content">
+                    <div id="{{ 'champion_ability_text_' + spell.key }}" class="spell_content">
                         <div class="lol_title" id="ability_title">{{ spell.name }}</div>
                         <select id="{{ 'ability_level_' + spell.key }}" class="ability_level" ng-click="apply()">
-                            <option ng-repeat="i in [] | range:spell.maxrank + 1" value="{{ i }}" ng-disabled="calculator.getChampion().get_points_used() + i > calculator.getChampion().getLevel() + 1">{{ i == 0?"Not Leveled":"Level " + (i) }}</option>
+                            <option ng-repeat="i in [] | range:spell.maxrank + 1" value="{{ i }}" >{{ i == 0?"Not Leveled":"Level " + (i) }}</option>
                         </select>
                         <div class="lol_content" id="ability_desc">{{ spell.parsed }}</div>
                     </div>
@@ -87,36 +114,82 @@
         <div id="build">
             <div id="build_items">
                 <div class="lol_title" id="items_title">Items</div>
+                <div class="lol_subtitle" id="items_price">{{ 'Total cost: ' + calculator.getChampion().getBuildPrice() }}</div>
                 <table id="build_items_table">
+                    <!--TODO add item description popup-->
                     <tr>
                         <td ng-repeat="item in calculator.getChampion().getItems().slice(0, 3) track by $index">
-                            <img ng-if="item != 0" class="item enabled" id="{{'item_img'+$index}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" title="{{calculator.items.data[item].name}}" onerror="this.src='notfound.png'" class="lol_icon item" ng-click="calculator.item_clicked($event)">
-                            <div class="blank_item blur" id="{{'item_button'+$index}}" ng-click="calculator.item_clicked($event)"></div>
+                            <img ng-if="item != 0" class="item enabled" id="{{'item_img'+$index}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.item_clicked($event)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
+                            <div class="blank_item blur clickable" id="{{'item_button'+$index}}" ng-click="calculator.item_clicked($event)"></div>
                         </td>
                     </tr>
                     <tr>
                         <td ng-repeat="item in calculator.getChampion().getItems().slice(3, 7) track by $index">
-                            <img ng-if="item != 0" class="item enabled" id="{{'item_img'+($index + 3)}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" title="{{calculator.items.data[item].name}}" onerror="this.src='notfound.png'" class="lol_icon item" ng-click="calculator.item_clicked($event)">
-                            <div class="blank_item blur" id="{{'item_button'+($index + 3)}}" ng-click="calculator.item_clicked($event)"></div>
+                            <img ng-if="item != 0" class="item enabled" id="{{'item_img'+($index + 3)}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.item_clicked($event)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
+                            <div class="blank_item blur clickable" id="{{'item_button'+($index + 3)}}" ng-click="calculator.item_clicked($event)"></div>
                         </td>
                     </tr>
                 </table>
-                <div id="item_popup" class="blur popup" ng-hide="!calculator.should_show_item_popup()">
-                    <input type="text" id="item_search" placeholder="search" ng-model="search.item" ng-change="calculator.update_search()" align="center">
-                    <div id="tbl" style="overflow-y:scroll; height:300px;" align="center">
+                <div id="item_popup" class="popup light_blur" ng-hide="!calculator.should_show_item_popup()">
+                    <input type="text" id="item_search" class="search" placeholder="search" ng-model="search.item" ng-change="calculator.update_search()" align="center" spellcheck="false">
+                    <div id="tbl" align="center" class="scroll">
                         <table id="item_search_results" ng-if="calculator.showSearch()">
                             <tr ng-repeat="i in []| range:calculator.getItemSearchRows()">
                                 <td ng-repeat="item in calculator.getItemSearchRow(i)">
-                                    <img src="{{ calculator.getImage(calculator.items.data[item].image) }}" title="{{calculator.items.data[item].name}}" onerror="this.src='notfound.png'" class="lol_icon item" ng-click="calculator.item_click(item)">
+                                    <img src="{{ calculator.getImage(calculator.items.data[item].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.item_click(item)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
                                 </td>
                             </tr>
                         </table>
                     </div>
                 </div>
             </div>
-            <!--div id="test_box">
-
-            </div-->
+            <div id="item_tooltip" class="light_blur tooltip" ng-hide="!calculator.showTooltip()">
+                <div id="tooltip_head_text">
+                    <div id="tooltip_title">{{calculator.items.data[calculator.getItemHover()].name}}</div>
+                    <div id="tooltip_desc">{{calculator.items.data[calculator.getItemHover()].plaintext}}</div>
+                </div>
+                <br>
+                <div id="tooltip_content" class="lol_content">
+                    {{calculator.items.data[calculator.getItemHover()].sanitizedDescription}}
+                </div>
+            </div>
+            <div id="build_runes">
+                <!--img src="https://s3-us-west-1.amazonaws.com/riot-api/img/rune-bg.png" id="rune_bg"-->
+                <div id="rune_border" class="blur">
+                    <img src="https://s3-us-west-1.amazonaws.com/riot-api/img/rune-bg.png" id="rune_bg">
+                </div>
+                <div id="rune_matrix">
+                    <div id="rune_overlay" ng-repeat="rune in calculator.getChampion().state.runes track by $index">
+                        <div id="rune" style="{{calculator.getRuneStyle($index, rune)}}" ng-click="calculator.rune_click($index)" class="clickable">
+                            <div id="select" ng-if="rune == -1">
+                                &#x2b22;
+                            </div>
+                            <div ng-if="rune != -1">
+                                <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)" id="{{$index > 26 ? 'quint_icon':'rune_icon'}}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="rune_popup" class="popup light_blur" ng-hide="!calculator.should_show_rune_popup()">
+                    <input type="text" id="rune_search" class="search" placeholder="search" ng-model="search.rune" ng-change="calculator.update_rune_search()" align="center" spellcheck="false">
+                    <div id="tbl" align="center" class="scroll">
+                        <table id="rune_search_results" ng-if="calculator.showRuneSearch()">
+                            <tr ng-repeat="i in []| range:calculator.getRuneSearchRows()">
+                                <td ng-repeat="rune in calculator.getRuneSearchRow(i)">
+                                    <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.rune_select(rune)" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="rune_tooltip" class="light_blur tooltip" ng-hide="!calculator.showRuneTooltip()">
+                <div id="tooltip_head_text">
+                    <div id="tooltip_title">{{calculator.runes.data[calculator.getRuneHover()].name}}</div>
+                    <div id="tooltip_desc">{{calculator.runes.data[calculator.getRuneHover()].sanitizedDescription}}</div>
+                </div>
+                <br>
+            </div>
         </div>
     </div>
 </body>

@@ -36,26 +36,144 @@ select{
     outline: rgba(128, 128, 128, .75);
 
     background-color: rgba(255, 255, 255, 0.5);
+
+    cursor: pointer; cursor: hand;
+}
+
+#select{
+    margin: 0;
 }
 
 #champion_header{
     margin: 20px;
+    position: relative;
+    display: inline-block;
+    float: left;
+    padding: 5px;
+    border-radius: 10px;
+}
+
+#rune_bg{
+    border-radius: 10px;
+    opacity: 0.8;
+    position: relative;
+}
+
+#rune_overlay{
+    clear: both;
+    position: absolute;
+    z-index: 50;
+    color: rgba(164, 164, 164, 0.51);
+
+    font-size: 65px;
+}
+
+#rune{
+    position: absolute;
+    display: inline-block;
 }
 
 #champion_icon{
     float: left;
+    border-radius: 5px;
 }
 
 #champion_title{
-
 }
 
 #build_items{
     position: relative;
+    display: inline-block;
+    float: right;
+}
+
+#rune_icon{
+    width: 48px;
+    height: 52px;
+
+}
+
+#quint_icon{
+    width: 80px;
+    height: 80px;
+}
+
+#build{
+    margin: 10px;
+}
+
+.clickable{
+    cursor: pointer; cursor: hand;
+}
+
+#rune_popup{
+    z-index: 200;
+    position: absolute;
+    padding: 5px;
+    border-radius: 10px;
+    max-width: 200px;
+    box-shadow: 5px 5px rgba(75, 75, 75, 0.5);
+}
+
+.tooltip{
+    z-index: 200;
+    position: absolute;
+    display: block;
+    padding: 5px;
+    border-radius: 10px;
+    max-width: 200px;
+    box-shadow: 5px 5px rgba(75, 75, 75, 0.5);
+
+}
+
+#rune_matrix{
+    position: relative;
+}
+
+#tooltip_head_text{
+    float: left;
+    vertical-align: top;
+    margin: 3px;
+}
+
+#tooltip_icon{
+    float: left;
+}
+
+#tooltip_desc{
+    color: #464646;
+}
+
+#tooltip_content{
+    color: black;
+    clear: both;
+}
+
+#build_runes{
+    clear: both;
+    float: right;
+    display: block;
+}
+
+#rune_border{
+    padding: 5px;
+    border-radius: 10px;
 }
 
 #items_title{
     text-align: center;
+}
+
+#items_price{
+    text-align: center;
+    color: #c9ab13;
+}
+
+#champ_popup_wrapper{
+    clear: both;
+    float: left;
+    position: relative;
+    width: 100%;
 }
 
 #divider{
@@ -63,13 +181,21 @@ select{
     height: 10px;
 }
 
-#item_popup{
-    border-radius: 10px;
-    width: 100%;
-    text-align: center
+#champion_popup{
+    margin-top: 10px;
+    margin-left: -5px;
 }
 
-#item_search{
+#champion_popup, #item_popup{
+    border-radius: 10px;
+    text-align: center;
+}
+
+#item_popup{
+    width: 100%;
+}
+
+.search{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -85,7 +211,15 @@ select{
 
 .popup{
     z-index: 100;
+    overflow: hidden;
     position: absolute;
+    height: auto;
+    box-shadow: 3px 3px rgba(75, 75, 75, 0.5);
+}
+
+.scroll{
+    height: 300px;
+    overflow-y: scroll;
 }
 
 .enabled.item{
@@ -93,7 +227,7 @@ select{
     position: absolute;
 }
 
-.item{
+.champion, .item{
     width: 48px;
     height: 48px;
     padding: 5px;

@@ -12,7 +12,8 @@ var Champion = function(riot_json, custom_json){
         cooldowns: [0, 0, 0, 0],
         buffs: [],
         items: [0, 0, 0, 0, 0, 0],
-        levels: [0, 0, 0, 0]
+        levels: [0, 0, 0, 0],
+        runes: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
     }
 
     this.resetStats()
@@ -31,8 +32,8 @@ Champion.prototype.resetStats = function () {
     this.add.attackSpeed = 0;
     this.mult.attackSpeed = 1;
 
-    this.add.crit = 0;
-    this.mult.crit = 1;
+    this.add.critChance = 0;
+    this.mult.critChance = 1;
 
     this.add.hp = 0;
     this.mult.hp = 1;
@@ -55,13 +56,75 @@ Champion.prototype.resetStats = function () {
     this.add.ap = 0;
     this.mult.ap = 1;
 
-    this.cdr = [0];
+    this.add.lifeSteal = 0;
+
+    this.add.magicPen = 0;
+
+    this.add.armorPen = 0;
+
+    this.add.critDamage = 0;
+    this.mult.critDamage = 2;
+
+    this.cd = 1;
 }
 
-Champion.prototype.calculateItems = function(){
+Champion.prototype.calculateBuild = function(){
     this.resetStats()
-    var self = this;
-    this.getItems().forEach(function(id){
+    calculateRunes(this)
+    calculateItems(this)
+}
+
+calculateRunes = function(self){
+    self.state.runes.forEach(function(id){
+        if(id == -1){
+            return;
+        }
+        var rune = runes.data[id];
+        if(rune.stats == undefined){
+            return;
+        }
+        for(var key in rune.stats){
+            switch (key){
+                case "FlatPhysicalDamageMod": self.add.ad += rune.stats[key]; break;
+                case "rFlatPhysicalDamageModPerLevel": self.add.ad += rune.stats[key] * (self.level + 1); break;
+                case "PercentAttackSpeedMod": self.mult.attackSpeed *= 1 + rune.stats[key]; break;
+                case "FlatCritDamageMod": self.add.critDamage += rune.stats[key]; break;
+                case "FlatCritChanceMod": self.add.critChance += rune.stats[key]; break;
+                case "rFlatArmorPenetrationMod": self.add.armorPen += rune.stats[key]; break;
+                case "FlatHPPoolMod": self.add.hp += rune.stats[key]; break;
+                case "rFlatHPModPerLevel": self.add.hp += rune.stats[key] * (self.level + 1); break;
+                case "FlatArmorMod": self.add.armor += rune.stats[key]; break;
+                case "FlatSpellBlockMod": self.add.mr += rune.stats[key]; break;
+                case "rFlatSpellBlockModPerLevel": self.add.mr += rune.stats[key] * (self.level + 1); break;
+                case "rPercentCooldownMod": self.cdr *= 1 - rune.stats[key]; break;
+                case "FlatMagicDamageMod": self.add.ap += rune.stats[key]; break;
+                case "rFlatMagicDamageModPerLevel": self.add.ap += rune.stats[key] * (self.level + 1); break;
+                case "FlatMPPoolMod": self.add.mana += rune.stats[key]; break;
+                case "rFlatMPModPerLevel": self.add.ap += rune.stats[key] * (self.level + 1); break;
+                case "FlatMPRegenMod": self.add.manaRegen += rune.stats[key]; break;
+                case "rFlatMagicPenetrationMod": self.add.magicPen += rune.stats[key]; break;
+                case "PercentMovementSpeedMod": self.mult.speed *= 1 + rune.stats[key]; break;
+                case "rFlatArmorModPerLevel": self.add.mr += rune.stats[key] * (self.level + 1); break;
+                case "FlatHPRegenMod": self.add.hpRegen *= 1 + rune.stats[key]; break;
+                case "rPercentCooldownModPerLevel": self.cd *= 1 - rune.stats[key] * (self.level + 1); break;
+                case "rFlatMPRegenModPerLevel": self.add.manaRegen += rune.stats[key] * (self.level + 1); break;
+                case "rFlatHPRegenModPerLevel": self.add.hpRegen += rune.stats[key] * (self.level + 1); break;
+                case "rPercentTimeDeadMod": break; //TODO implement
+                case "rFlatGoldPer10Mod": break; //TODO implement
+                case "PercentEXPBonus": break; //TODO implement
+                case "FlatEnergyRegenMod": break; //TODO implement
+                case "PercentHPPoolMod": self.mult.hp *= 1 + rune.stats[key]; break;
+                case "PercentSpellVampMod": break; //TODO implement
+                case "PercentLifeStealMod": break; //TODO implement
+
+                default: console.log(key); console.log(rune.stats[key]); break;
+            }
+        }
+    })
+}
+
+calculateItems = function(self){
+    self.getItems().forEach(function(id){
         if(id == 0){
             return;
         }
@@ -74,13 +137,13 @@ Champion.prototype.calculateItems = function(){
                 case "FlatArmorMod": self.add.armor += item.stats[key]; break;
                 case "FlatMovementSpeedMod": self.add.speed += item.stats[key]; break;
                 case "FlatHPPoolMod": self.add.hp += item.stats[key]; break;
-                case "FlatCritChanceMod": self.add.crit += item.stats[key]; break;
+                case "FlatCritChanceMod": self.add.critChance += item.stats[key]; break;
                 case "FlatMagicDamageMod": self.add.ap += item.stats[key]; break;
                 case "FlatMPPoolMod": self.add.mana += item.stats[key]; break;
                 case "FlatSpellBlockMod": self.add.mr += item.stats[key]; break;
                 case "FlatPhysicalDamageMod": self.add.ad += item.stats[key]; break;
                 case "PercentAttackSpeedMod": self.mult.attackSpeed *= 1 + item.stats[key]; break;
-                case "PercentLifeStealMod": break; /*FIXME Implement*/
+                case "PercentLifeStealMod": self.add.lifeSteal += item.stats[key]; break; /*FIXME Implement*/
                 case "FlatHPRegenMod": self.add.hpRegen += item.stats[key]; break;
                 case "FlatMPRegenMod": self.add.manaRegen += item.stats[key]; break;
                 case "PercentMovementSpeedMod": self.mult.speed *= 1 + item.stats[key]; break
@@ -96,7 +159,7 @@ Champion.prototype.getBaseArmor = function(){
 }
 
 Champion.prototype.getArmor = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseArmor() + this.add.armor) * this.mult.armor
 }
 
@@ -105,7 +168,7 @@ Champion.prototype.getBaseAD = function () {
 }
 
 Champion.prototype.getAD = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseAD() + this.add.ad) * this.mult.ad
 }
 
@@ -114,7 +177,7 @@ Champion.prototype.getBaseRange = function() {
 }
 
 Champion.prototype.getRange = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseRange() + this.add.range) * this.mult.range
 }
 
@@ -123,7 +186,7 @@ Champion.prototype.getBaseAttackSpeed = function(){
 }
 
 Champion.prototype.getAttackSpeed = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseAttackSpeed() + this.add.attackSpeed) * this.mult.attackSpeed
 }
 
@@ -132,8 +195,8 @@ Champion.prototype.getBaseCritChance = function(){
 }
 
 Champion.prototype.getCritChance = function(){
-    this.calculateItems();
-    return (this.getBaseCritChance() + this.add.crit) * this.mult.crit;
+    this.calculateBuild();
+    return (this.getBaseCritChance() + this.add.critChance) * this.mult.critChance;
 }
 
 Champion.prototype.getBaseHP = function(){
@@ -141,7 +204,7 @@ Champion.prototype.getBaseHP = function(){
 }
 
 Champion.prototype.getHP = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseHP() + this.add.hp) * this.mult.hp
 }
 
@@ -150,7 +213,7 @@ Champion.prototype.getBaseHPRegen = function(){
 }
 
 Champion.prototype.getHPRegen = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseHPRegen() + this.add.hpRegen) * this.mult.hpRegen
 }
 
@@ -159,7 +222,7 @@ Champion.prototype.getBaseSpeed = function(){
 }
 
 Champion.prototype.getSpeed = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseSpeed() + this.add.speed) * this.mult.speed;
 }
 
@@ -168,17 +231,17 @@ Champion.prototype.getBaseMana = function(){
 }
 
 Champion.prototype.getMana = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseMana() + this.add.mana) * this.mult.mana;
 }
 
 Champion.prototype.getBaseManaRegen = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.base.stats.mpregen + (this.base.stats.mpregenperlevel * this.level))
 }
 
 Champion.prototype.getManaRegen = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseManaRegen() + this.add.manaRegen) * this.mult.manaRegen
 }
 
@@ -187,24 +250,18 @@ Champion.prototype.getBaseMR = function(){
 }
 
 Champion.prototype.getMR = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return (this.getBaseMR() + this.add.mr) * this.mult.mr
 }
 
 Champion.prototype.getAP = function(){
-    this.calculateItems();
+    this.calculateBuild();
     return this.add.ap * this.mult.ap;
 }
 
 Champion.prototype.getCD = function(){
-    this.calculateItems();
-    var cd = 1;
-    this.cdr.forEach(function(cdr){
-        cd *= (1 - cdr);
-    })
-
-    if(cd < .6){cd = .6}
-    return cd;
+    this.calculateBuild();
+    return this.cd > .6 ? this.cd:.6;
 }
 
 Champion.prototype.getSpell = function(index){
@@ -223,6 +280,19 @@ Champion.prototype.getSpells = function(){
 
 Champion.prototype.getItems = function(){
     return this.state.items;
+}
+
+Champion.prototype.getBuildPrice = function(){
+    var price = 0;
+    this.getItems().forEach(function(id){
+        if(id == 0){
+            return;
+        }
+        item = items.data[id];
+        price += item.gold.total;
+    })
+
+    return price;
 }
 
 parse_spell = function(champ, spell){
@@ -247,14 +317,27 @@ parse_spell = function(champ, spell){
         spell.vars.forEach(function(v){
             var value;
             switch(v.link){
-                case "spelldamage": value = champ.getAP(); break;
+                case "spelldamage":case "@dynamic.abilitypower": value = champ.getAP(); break;
                 case "attackdamage":case "@dynamic.attackdamage": value = champ.getAD(); break;
                 case "bonusattackdamage": value = champ.getAD() - champ.getBaseAD(); break; /*FIXME Change to OO champion*/
                 case "@cooldownchampion": value = champ.getCD(); break;
+                case "health": value = champ.getHP(); break;
+                case "bonushealth": value = champ.getHP() - champ.getBaseHP(); break;
+                case "@special.nautilusq": break; /*FIXME Implement*/
+                case "@text": if(v.coeff.length == spell.maxrank){
+                        value = v.coeff[lvl-1]
+                    };
+                    if(v.coeff.length == 18){
+                        value = v.coeff[champ.level]
+                    };
+                    break;
 
                 default: alert(v.link)
             }
-            if(lvl == 0){
+            if(v.link == "@text"){
+
+            }
+            else if(lvl == 0){
                 value = 0
             }
             else if(v.coeff.length == 1){
