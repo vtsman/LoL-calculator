@@ -175,10 +175,8 @@ calculateMasteries = function(self){
                 case 4143: self.mult.ap *= 1.005 + 0.015 * lvl; break;
                 case 4144: break; //TODO implement dangerous game
                 case 4151: break; //TODO implement frenzy
-                case 4152: switch(lvl){
-                    case 1:
-                } break;
-                case 4151: self.add.ad += self.getAP() / (20 * self.mult.ad); break;
+                case 4152: self.mult.magicPen *= 1 + 0.02 * lvl; self.mult.armorPen *= 1 + 0.02 * lvl; break;
+                case 4154: self.add.ad += self.getAP(false) / (20 * self.mult.ad); break;
                 case 4162: self.mult.ad *= 1.03; self.mult.ap *= 1.03; break;
                 //Defense
                 case 4211: self.add.adDamageTaken -= lvl;
