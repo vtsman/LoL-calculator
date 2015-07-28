@@ -3,7 +3,7 @@
  */
 api_url="http://127.0.0.1:5000/"
 
-app = angular.module('build', ['ngAnimate']);
+app = angular.module('build', ['ngAnimate', 'ngSanitize']);
 
 $(function() {
     url = "url(bg/" + getRandomInt(1, 2) + ".jpg)"
@@ -49,8 +49,11 @@ function getUrlVars() {
 var items = undefined;
 var runes = undefined;
 
-app.controller('CalculatorController', function($scope) {
+var calc = undefined;
+
+app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce) {
     var calculator = this;
+    calc = this;
     var current_champion = undefined;
     var current_champion_api = undefined;
     calculator.items = undefined;
@@ -62,8 +65,12 @@ app.controller('CalculatorController', function($scope) {
     champKeys = undefined;
     calculator.rune_coords = undefined;
     calculator.active_rune = -1;
+    calculator.masteries = undefined;
+    var current_version = "5.14.1";
+    calculator.mastery_levels = {};
 
     var loadChamp = function(id){
+        console.log($sce)
         $.ajax({
             method: "GET",
             url: api_url + "api/lol/static-data/na/v1.2/champion/" + id,
@@ -137,7 +144,43 @@ app.controller('CalculatorController', function($scope) {
                 console.log(error)
             });
 
+        $.ajax({
+            method: "GET",
+            url: api_url + "api/lol/static-data/na/v1.2/mastery",
+            data: {"masteryListData": "all"},
+            async: 'true'
+        }).done(
+            function (data) {
+                calculator.masteries = JSON.parse(data);
+                for(var key in calculator.masteries.data){
+                    calculator.mastery_levels[key] = 0;
+                }
 
+                for(var key in calculator.masteries.data){
+                    var prereq = parseInt(calculator.masteries.data[key].prereq);
+                    if(prereq > 0){
+                        calculator.masteries.data[prereq].req = key;
+                    }
+                }
+                console.log(calculator.masteries)
+                calculator.apply();
+            }
+        ).fail(function (error) {
+                console.log(error)
+            });
+
+        $.ajax({
+            method: "GET",
+            url: api_url + "api/lol/static-data/na/v1.2/versions",
+            async: 'true'
+        }).done(
+            function (data) {
+                current_version = JSON.parse(data)[0]
+                console.log(current_version)
+            }
+        ).fail(function (error) {
+                console.log(error)
+            });
     }
 
     calculator.switchChamp = function(champ){
@@ -411,7 +454,10 @@ app.controller('CalculatorController', function($scope) {
     }
 
     calculator.getImage = function(image){
-        return "https://ddragon.leagueoflegends.com/cdn/5.12.1/img/" + image.group + "/" + image.full;
+        if(image.group == "gray_mastery"){
+            image.group = "mastery";
+        }
+        return "https://ddragon.leagueoflegends.com/cdn/" + current_version + "/img/" + image.group + "/" + image.full;
     }
 
     calculator.item_click = function(item){
@@ -421,6 +467,22 @@ app.controller('CalculatorController', function($scope) {
             }
         }
         calculator.active_item = -1
+    }
+
+    calculator.getItemDesc = function(item){
+        if(item == undefined){
+            return;
+        }
+
+        if(calculator.items == undefined){
+            return;
+        }
+
+        if(calculator.items.data[item] == undefined){
+            return;
+        }
+
+        return calculator.items.data[item].description;
     }
 
     var item_hover_id = -1;
@@ -449,6 +511,20 @@ app.controller('CalculatorController', function($scope) {
 
     calculator.showChampTooltip = function(){
         return champ_hover != undefined;
+    }
+
+    var mastery_hover = -1;
+
+    calculator.setMasteryHover = function(mastery){
+        mastery_hover = mastery
+    }
+
+    calculator.getMasteryHover = function(){
+        return mastery_hover;
+    }
+
+    calculator.showMasteryTooltip = function(){
+        return mastery_hover != -1;
     }
 
     var rune_hover_id = -1;
@@ -554,7 +630,189 @@ app.controller('CalculatorController', function($scope) {
 
         return searched_runes.slice(row * cCol, end)
     }
-});
+
+    calculator.getTree = function(name){
+        return calculator.masteries.tree[name];
+    }
+
+    calculator.showMasteries = function(){
+        return calculator.masteries != undefined;
+    }
+
+    calculator.incMastery = function(id){
+        if(calculator.get_mastery_points() == 30){
+            return;
+        }
+        if(calculator.mastery_levels[id] < calculator.masteries.data[id].ranks){
+            if(calculator.mastery_avail(id)){
+                calculator.mastery_levels[id]++;
+            }
+        }
+    }
+
+    calculator.decMastery = function(id){
+        if(calculator.mastery_levels[id] > 0){
+            var tree = calculator.masteries.data[id].masteryTree;
+            if(!calculator.check_mast_dec(id)){
+                return;
+            }
+            if(calculator.masteries.data[id].req != undefined){
+                if(calculator.mastery_levels[calculator.masteries.data[id].req] > 0){
+                    return;
+                }
+            }
+            calculator.mastery_levels[id]--;
+        }
+    }
+
+    calculator.check_mast_dec = function(id){
+        var change_tier = calculator.get_mastery_tier(id);
+        var curr_tier = calculator.get_last_mastery_tier(calculator.masteries.data[id].masteryTree);
+        if(change_tier == curr_tier){
+            return true;
+        }
+        if(Math.floor((calculator.sum_masteries_to_tier(calculator.masteries.data[id].masteryTree, curr_tier - 1) - 1) / 4) >= curr_tier){
+            return true;
+        }
+        return false;
+    }
+
+    calculator.get_last_mastery_tier = function(tr){
+        var tree = calculator.masteries.tree[tr];
+        var out = 0;
+        for(var key in tree){
+            row = tree[key].masteryTreeItems
+            var rTot = 0;
+            for(var mKey in row){
+                m = row[mKey];
+                if(m == null){
+                    continue;
+                }
+                rTot += calculator.mastery_levels[m.masteryId]
+            }
+            if(rTot == 0){
+                return out - 1;
+            }
+            if(out == 5){
+                return 5;
+            }
+            out++;
+        }
+    }
+
+    calculator.sum_masteries_to_tier = function(tr, tier){
+        var tree = calculator.masteries.tree[tr];
+        var out = 0;
+        var r = 0;
+        for(var key in tree){
+            row = tree[key].masteryTreeItems;
+            for(var mKey in row){
+                m = row[mKey];
+                if(m == null){
+                    continue;
+                }
+                out += calculator.mastery_levels[m.masteryId]
+            }
+            if(r == tier){
+                return out;
+            }
+            r++;
+        }
+    }
+
+    calculator.get_mastery_tree_points = function(tree){
+        var out = 0;
+        for(var key in calculator.mastery_levels){
+            if(calculator.masteries.data[key].masteryTree == tree)
+                out += calculator.mastery_levels[key];
+        }
+        return out;
+    }
+
+    calculator.mastery_avail = function(mastery){
+        if(calculator.get_mastery_points() == 30){
+            return false;
+        }
+        if(calculator.get_mastery_tier(mastery) * 4 > calculator.get_mastery_tree_points(calculator.masteries.data[mastery].masteryTree)){
+            return false;
+        }
+        var prereq = parseInt(calculator.masteries.data[mastery].prereq);
+        if(prereq != 0){
+            if(calculator.masteries.data[prereq].ranks != calculator.mastery_levels[prereq]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    calculator.get_mast_class_string = function(id){
+        var out = "mastery clickable";
+        if(calculator.mastery_levels[id] == 0){
+            if(calculator.mastery_avail(id)){
+                out += " partsat"
+            }
+            else{
+                out += " desat"
+            }
+        }
+        return out;
+    }
+
+    calculator.get_mastery_tier = function(id){
+        if(calculator.masteries == undefined){
+            return -1;
+        }
+        if(calculator.masteries.data[id] == undefined){
+            return -1;
+        }
+        if(calculator.masteries.data[id].tier != undefined){
+            return calculator.masteries.data[id].tier;
+        }
+        /*var treeName = calculator.masteries.data[id].masteryTree;
+        var tree = calculator.masteries.tree[treeName];
+        var out = 0;
+        for(var key in tree){
+            row = tree[key].masteryTreeItems;
+            for(var mKey in row){
+                m = row[mKey];
+                if(m == null){
+                    continue;
+                }
+                if(m.masteryId == id){
+                    calculator.masteries.data[id].tier = out;
+                    return out;
+                }
+            }
+            out++;
+        }*/
+        //TODO see if this is all that hacky
+        return parseInt(id.toString().substr(2, 1)) - 1
+    }
+
+    calculator.get_mastery_points = function(){
+        var out = 0;
+        for(var key in calculator.mastery_levels){
+            out += calculator.mastery_levels[key];
+        }
+        return out;
+    }
+
+    calculator.getMasteryDesc = function(id){
+        if(calculator.masteries == undefined){
+            return "";
+        }
+        if(id == -1){
+            return;
+        }
+        if(calculator.mastery_levels[id] == 0){
+            return "";
+        }
+        if(calculator.masteries.data[id] == undefined){
+            return "";
+        }
+        return calculator.masteries.data[id].sanitizedDescription[calculator.mastery_levels[id] - 1];
+    }
+}]);
 
 app.filter('range', function() {
     return function(input, total) {
@@ -562,5 +820,70 @@ app.filter('range', function() {
         for (var i=0; i<total; i++)
             input.push(i);
         return input;
+    };
+});
+
+app.directive('mastery', function($compile) {
+    return {
+        restrict: 'E',
+        transclude : true,
+        scope : {
+            tree : '=',
+        },
+        templateUrl: 'mastery.html',
+        link: function($scope, $element, attr){
+            $($element.find("div")[0]).attr({
+                'id': attr.tree.toLowerCase() + "_grid"
+            })
+
+            $element.find("table").attr({
+                'id': attr.tree.toLowerCase() + "_mastery_table"
+            })
+
+            $element.find("img").attr({
+                'src': "{{calculator.getImage(calculator.masteries.data[mastery.masteryId].image)}}"
+            })
+
+            $element.find("tr").attr({
+                'ng-repeat':"row in calculator.getTree('" + attr.tree + "')"
+            });
+
+            $element.find("td").attr({
+                'ng-repeat':"mastery in row.masteryTreeItems"
+            });
+
+            $element.find("img").attr({
+                'ng-click': "calculator.incMastery(mastery.masteryId)",
+                'ng-right-click': "calculator.decMastery(mastery.masteryId)",
+                'class': "{{calculator.get_mast_class_string(mastery.masteryId)}}",
+                'ng-mouseenter': "calculator.setMasteryHover(mastery.masteryId)",
+                'ng-mouseleave': "calculator.setMasteryHover(-1)"
+            });
+
+            $(".mastery_section").attr({
+                'ng-if':"mastery != null"
+            })
+
+            $(".mastery_counter").text("{{calculator.mastery_levels[mastery.masteryId] + '/' + calculator.masteries.data[mastery.masteryId].ranks}}")
+
+            var pt_counter = $($($element.children()[0]).children()[1]);
+
+            pt_counter.text("{{" + "'" + attr.tree + ": '" + " + calculator.get_mastery_tree_points(" + '"' + attr.tree + '"' + ")}}")
+
+            $compile(pt_counter)($scope.$parent);
+            $compile($element.find("tr"))($scope.$parent);
+        }
+    }
+});
+
+app.directive('ngRightClick', function($parse) {
+    return function(scope, element, attrs) {
+        var fn = $parse(attrs.ngRightClick);
+        element.bind('contextmenu', function(event) {
+            scope.$apply(function() {
+                event.preventDefault();
+                fn(scope, {$event:event});
+            });
+        });
     };
 });

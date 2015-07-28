@@ -53,10 +53,11 @@ select{
     border-radius: 10px;
 }
 
-#rune_bg{
+#mastery_bg, #rune_bg{
     border-radius: 10px;
     opacity: 0.8;
     position: relative;
+    z-index: 10;
 }
 
 #rune_overlay{
@@ -149,13 +150,60 @@ select{
     clear: both;
 }
 
-#build_runes{
+#build_masteries{
+    margin-top: 10px;
+    position: relative;
+}
+
+.mastery_grid{
+    position: absolute;
+    z-index: 100;
+}
+
+.mastery_table td{
+    padding: 5px;
+}
+
+.point_counter{
+    color: white;
+    margin: 5px;
+}
+
+#offense_grid{
+    top: 10px;
+    left: 12px;
+}
+
+#defense_grid{
+    top: 10px;
+    left: 224px;
+}
+
+#utility_grid{
+    top: 10px;
+    left: 436px;
+}
+
+.mastery{
+    width: 38px;
+    height: 38px;
+}
+
+.desat{
+    -webkit-filter: grayscale(100%); filter: grayscale(100%);
+}
+
+.partsat{
+    -webkit-filter: grayscale(60%); filter: grayscale(60%);
+}
+
+#build_masteries, #build_runes{
     clear: both;
     float: right;
     display: block;
 }
 
-#rune_border{
+#mastery_border, #rune_border{
     padding: 5px;
     border-radius: 10px;
 }
@@ -331,6 +379,17 @@ select{
     padding: 5px;
 }
 
-body{
-    background-color: #333333;
+.mastery_section{
+    position: relative;
+}
+
+.mastery_counter{
+    position: absolute;
+    top: 28px;
+    left: 20px;
+    display: block;
+    color: #B1B1B1;
+    background-color: rgba(70, 70, 70, 0.5);
+    border: 1px solid #404040;
+    padding: 1px;
 }
