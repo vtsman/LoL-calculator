@@ -2,7 +2,7 @@
 A website for calculating stats on a set of items in League of Legends
 
 The current website looks like so:
-![alt text](http://i.imgur.com/8KvCPgU.jpg "The website featuring stats on Teemo")
+![alt text](http://i.imgur.com/J1CdHYw.png "The website featuring stats on Teemo")
 
 LoL Calculator (temporary name) isn’t endorsed by Riot Games and doesn’t reflect 
 the views or opinions of Riot Games or anyone officially involved in producing or 
