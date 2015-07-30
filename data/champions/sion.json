@@ -1,0 +1,37 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f2":[
+          "return function(champion, lvl){",
+          "return champion.getHP() * (.09 + 0.1 * lvl)",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f1": ["return function(){return 0}"]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f5":[
+          "return function(champion){",
+          "if(champion.level > 11){return 0.5}",
+          "if(champion.level > 5){return 1}",
+          "return 2",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f3":[
+          "return function(champion){",
+          "var out = 12",
+          "if($.inArray(3901, champion.getItems()) > -1){",
+          "out += 6",
+          "}",
+          "return out;",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    }
+  ]
+}

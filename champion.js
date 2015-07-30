@@ -5,6 +5,12 @@ var Champion = function(riot_json, custom_json){
     this.level = 0;
     this.base = riot_json;
 
+    /*url = "url(http://ddragon.leagueoflegends.com/cdn/img/champion/splash/" + this.base.name.split(" ").join("") + "_" + getRandomInt(0, this.base.skins.length - 1) + ".jpg)";
+    $("body").css("background-image", url);*/
+
+    this.supp_json = custom_json;
+
+
     this.add = {};
     this.mult = {};
 
@@ -371,13 +377,13 @@ Champion.prototype.getCD = function(masteries){
 
 Champion.prototype.getSpell = function(index){
     var ret = this.base.spells[index];
-    ret.parsed = parse_spell(this, ret);
+    ret.parsed = parse_spell(this, ret, index);
     return ret;
 }
 
 Champion.prototype.getSpells = function(){
     var arr = [];
-    for(var i = 0; i < 4; i++){
+    for(var i = 0; i < this.base.spells.length; i++){
         arr[i] = this.getSpell(i)
     }
     return arr
@@ -400,7 +406,16 @@ Champion.prototype.getBuildPrice = function(){
     return price;
 }
 
-parse_spell = function(champ, spell){
+Champion.prototype.getAbilityLevel = function(index){
+    spell = this.base.spells[index]
+    lvl = 0;
+    if($("#ability_level_" + spell.key)[0]!= undefined){
+        lvl = parseInt($("#ability_level_" + spell.key)[0].value);
+    }
+    return lvl;
+}
+
+parse_spell = function(champ, spell, ind){
     var tt_vars = {};
     var lvl = 0;
     if($("#ability_level_" + spell.key)[0]!= undefined){
@@ -418,40 +433,96 @@ parse_spell = function(champ, spell){
         }
         index++;
     })
+    var vars = [];
     if(spell.vars != undefined){
-        spell.vars.forEach(function(v){
+        vars = spell.vars.slice();
+    }
+    var cust = champ.supp_json.abilities[ind];
+    for(var k in cust.vars){
+        if(k !== "__comment__") {
+            var f = json_func(cust.vars[k]);
+            var p = {
+                link: "const",
+                value: f(champ, lvl),
+                key: k
+            };
+            if (p.value === undefined) {
+                p.link = "none";
+            }
+            vars.push(p)
+        }
+    }
+    if(vars.length > 0){
+        vars.forEach(function(v){
             var value;
+            var co = true;
             switch(v.link){
+                case "const": value = v.value; break;
                 case "spelldamage":case "@dynamic.abilitypower": value = champ.getAP(); break;
                 case "attackdamage":case "@dynamic.attackdamage": value = champ.getAD(); break;
-                case "bonusattackdamage": value = champ.getAD() - champ.getBaseAD(); break; /*FIXME Change to OO champion*/
+                case "bonusattackdamage": value = champ.getAD() - champ.getBaseAD(); break;
                 case "@cooldownchampion": value = champ.getCD(); break;
                 case "health": value = champ.getHP(); break;
                 case "bonushealth": value = champ.getHP() - champ.getBaseHP(); break;
                 case "@special.nautilusq": break; /*FIXME Implement*/
-                case "@text": if(v.coeff.length == spell.maxrank){
+                case "@text":
+                    if(v.ranksWith == "KarmaMantra"){
+                        var l = champ.getAbilityLevel(3);
+                        if(l > 0){
+                            value = v.coeff[l - 1];
+                        }
+                        else{
+                            value = 0;
+                        }
+
+                        co = false;
+                    }
+                    if(v.coeff.length == spell.maxrank){
+                    if(lvl = 0){
+                        value = 0;
+                    }
+                    else{
                         value = v.coeff[lvl-1]
-                    };
+                    }
+                };
                     if(v.coeff.length == 18){
                         value = v.coeff[champ.level]
                     };
                     break;
-
+                case "@special.jaxrarmor": value = 10 + 20 * lvl + (champ.getAD() - champ.getBaseAD()) * .5; co = false; break;
+                case "@special.jaxrmr": value = 10 + 20 * lvl + (champ.getAP()) * .2; co = false; break;
+                case "armor": value = champ.getArmor(); break;
+                case "none": value = ""; break;
+                case "@special.BraumWArmor": value = 12.5 + (2.5 * lvl) + (.085 + .015 * lvl) * (champ.getArmor() - champ.getBaseArmor()); co = false; break;
+                case "@special.BraumWMR": value = 12.5 + (2.5 * lvl) + (.085 + .015 * lvl) * (champ.getMR() - champ.getBaseMR()); co = false; break;
+                case "@special.jaycew": value = 62 + 8 * lvl; co = false; break;
+                case "bonusarmor": value = champ.getArmor() - champ.getBaseArmor(); break;
+                case "bonusspellblock": value = champ.getMR() - champ.getBaseMR(); break;
+                case "@stacks": value = 0; break; //TODO implement stacks
+                case "@special.dariusr3": value = 1; break; //TODO implement darius stacks
+                case "@special.viw": value = Math.floor((champ.getAD() - champ.getBaseAD()) / 35); break;
                 default: alert(v.link)
             }
-            if(v.link == "@text"){
-
-            }
-            else if(lvl == 0){
+            if(lvl == 0){
                 value = 0
             }
-            else if(v.coeff.length == 1){
-                value *= v.coeff[0]
+            else if(v.link == "@text" || v.link == "const" || v.link == "none"){
+
+            }
+            else if(co){
+                if(v.coeff.length == 1){
+                    value *= v.coeff[0]
+                }
+                else{
+                    value *= v.coeff[lvl - 1]
+                }
+            }
+            if(v.link == "none"){
+                tt_vars[v.key] = "";
             }
             else{
-                value *= v.coeff[lvl - 1]
+                tt_vars[v.key] = Math.round(value);
             }
-            tt_vars[v.key] = Math.round(value);
         })
     }
 

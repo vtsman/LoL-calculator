@@ -1,0 +1,41 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f1": [
+          "return function(champion){",
+          "return champion.getAD() - champion.getBaseAD();",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f3": [
+          "return function(){return undefined;};"
+        ]
+      },
+      "use": [
+
+      ]
+    }
+  ]
+}

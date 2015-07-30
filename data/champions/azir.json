@@ -1,0 +1,48 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f2": [
+          "return function(champion, lvl){return 20 + 30 * lvl};"
+        ],
+        "maxammo": [
+          "return function(){return 2}"
+        ],
+        "f1": [
+          "return function(champion, lvl){return 13 - lvl};"
+        ],
+        "f4": [
+          "return function(champion){return 60 + 10 * champion.level}"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion){return .15 * (champion.getHP() - champion.getBaseHP())};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

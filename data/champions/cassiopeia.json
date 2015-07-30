@@ -1,0 +1,42 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f2": [
+          "return function(champion){",
+          "return 11 * champion.getAP() / 20;",
+          "};"
+        ],
+        "f3": [
+          "return function(champion){",
+          "return 15 * champion.getMana() / 1000;",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

@@ -79,10 +79,12 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }).done(
             function (data) {
                 current_champion_api = JSON.parse(data);
-                current_champion = new Champion(current_champion_api, null);
-                console.log(current_champion)
-                calculator.apply();
-                blur();
+                $.getJSON("data/champions/" + current_champion_api.key.toLowerCase() + ".json", function(cust){
+                    current_champion = new Champion(current_champion_api, cust);
+                    console.log(current_champion);
+                    calculator.apply();
+                    blur();
+                })
             }
         ).fail(function (error) {
                 console.log(error)

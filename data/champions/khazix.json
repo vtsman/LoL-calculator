@@ -1,0 +1,42 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f3": [
+          "return function(champion, level){",
+          "return (champion.level + 1) * 10",
+          "};"
+        ],
+        "f2": [
+          "return function(champion, level){",
+          "return 1.04 * (champion.getAD() - champion.getBaseAD())",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

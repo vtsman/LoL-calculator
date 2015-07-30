@@ -1,0 +1,47 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f3": [
+          "return function(champion){",
+          "return .3 * champion.getAP()",
+          "};"
+        ],
+        "f2": [
+          "return function(champion){",
+          "var ret = champion.getAD();",
+          "if(ret + champion.getAP() / 2 < 20){return 20 - champion.getAP() / 2}",
+          "if(ret + champion.getAP() / 2 > 210){",
+          "ret = 210 - champion.getAP()}",
+          "if(ret < 0){return 0;}",
+          "return ret;",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

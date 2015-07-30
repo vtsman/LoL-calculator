@@ -1,0 +1,42 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion, lvl){",
+          "return champion.getArmor() * (.05 + 0.05 * lvl)",
+          "};"
+        ],
+        "f2": [
+          "return function(champion){",
+          "return champion.getArmor() * .1",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

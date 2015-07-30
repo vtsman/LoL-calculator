@@ -1,0 +1,71 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f3":[
+          "return function(champion, lvl){",
+          "return champion.getAD() * (.95 + .5 * lvl)",
+          "};"
+        ],
+        "f4": [
+          "return function(champion){",
+          "return champion.level * 3 + 50",
+          "};"
+        ],
+        "f2": [
+          "return function(champion){",
+          "var out = champion.level * 15 + 30",
+          "if(champion.level > 8){out -= (champion.level - 8) * 5}",
+          "return out",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f2": [
+          "return function(champion){",
+          "var out = champion.level * 15 + 40",
+          "if(champion.level > 8){out -= (champion.level - 8) * 5}",
+          "return out",
+          "};"
+        ],
+        "f1": [
+          "return function(champion){return 12 + 4 * champion.level;};"
+        ],
+        "f3": [
+          "return function(champion){return 75 + 25 * champion.level;};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion){",
+          "var out = champion.level * 25 + 30",
+          "if(champion.level > 8){out -= (champion.level - 8) * 15}",
+          "return out",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

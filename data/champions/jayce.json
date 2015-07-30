@@ -1,0 +1,68 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f3": [
+          "return function(champ, lvl){",
+          "return 5 + lvl * 5",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion, lvl){return -5 + 10 * lvl;};"
+        ],
+        "f2": [
+          "return function(champion, lvl){return -20 + 40 * lvl;};"
+        ]
+      },
+      "use": [
+
+      ]
+    }
+  ]
+}

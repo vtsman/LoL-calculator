@@ -1,0 +1,56 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f3": [
+          "return function(champion){",
+          "return 3 * (champion.getAD() - champion.getBaseAD()) / 25",
+          "};"
+        ],
+        "f4": [
+          "return function(champion){",
+          "return 3 * (champion.getAD() - champion.getBaseAD()) / 25",
+          "};"
+        ],
+        "f5": [
+          "return function(champion, lvl){",
+          "return 4.5 + 4.5 * lvl",
+          "};"
+        ],
+        "f6": [
+          "return function(champion){",
+          "return 9 * (champion.getAD() - champion.getBaseAD()) / 25",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f3": [
+          "return function(champion){return champion.getAD() * 3}"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

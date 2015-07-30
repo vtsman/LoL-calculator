@@ -1,0 +1,47 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f3": [
+          "return function(){return 10};"
+        ],
+        "f4": [
+          "return function(){return 15};"
+        ],
+        "f5": [
+          "return function(){return 1};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f2": [
+          "return function(champion, lvl){",
+          "return 46.875 + 31.25 * lvl + champion.getAP() * .3125",
+          "}"
+        ]
+      },
+      "use": [
+
+      ]
+    }
+  ]
+}

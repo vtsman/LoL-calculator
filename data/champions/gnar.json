@@ -1,0 +1,49 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f1":[
+          "return function(champion){",
+          "return 45 + 5 * champion.getAbilityLevel(3)",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1":[
+          "return function(champion){",
+          "return 30 + 15 * champion.getAbilityLevel(3)",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1":[
+          "return function(champion){",
+          "return 0.06 * champion.getHP()",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

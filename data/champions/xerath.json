@@ -1,0 +1,42 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1":[
+          "return function(champion, lvl){",
+          "return champion.base.spells[1].effect[1][lvl - 1] * 1.5;",
+          "};"
+        ],
+        "f2":[
+          "return function(champion){",
+          "return champion.getAP() * .9;",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

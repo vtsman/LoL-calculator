@@ -1,0 +1,54 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{
+        "f1": [
+          "return function(champion, lvl){",
+          "return champion.getMana() * (.015 + .005 * lvl)",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion, lvl){",
+          "return champion.getMana() * .025",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion, lvl){",
+          "return champion.getMana() * .02",
+          "};"
+        ],
+        "f2": [
+          "return function(champion, lvl){",
+          "return champion.getMana() * .01",
+          "};"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    }
+  ]
+}

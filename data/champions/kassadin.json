@@ -1,0 +1,38 @@
+{
+  "passive": [
+    "return function(champion){return;};"
+  ],
+  "abilities":[
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{},
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champion){return 0.01 * champion.getMana()}"
+        ],
+        "f2": [
+          "return function(champion){return 0.01 * champion.getMana()}"
+        ]
+      },
+      "use": [
+
+      ]
+    }
+  ]
+}
