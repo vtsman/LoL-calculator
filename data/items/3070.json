@@ -1,0 +1,14 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion, slot){",
+        "champion.add.mana +=  calc.getItemStacks(slot)",
+        "}"
+      ],
+      "name": "tearpass"
+    }
+  ],
+  "stacks": 750
+}

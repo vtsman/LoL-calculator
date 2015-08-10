@@ -1,0 +1,13 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.cd -= .1",
+        "}"
+      ],
+      "name": "idolpassive"
+    }
+  ]
+}

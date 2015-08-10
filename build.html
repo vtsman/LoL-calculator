@@ -13,9 +13,13 @@
     <script src="champion_calculator.js"></script>
     <script src="champion.js"></script>
     <link href="./global.css" media="all" rel="stylesheet" />
+    <link rel='stylesheet' media='screen and (max-width: 800px)' href="./mobile.css" />
 </head>
 <body ng-controller="CalculatorController as calculator">
     <div ng-init="calculator.init()" id="wrapper">
+        <div id="error" ng-if="calculator.showError()">
+            {{"Error: " + calculator.getError()}}
+        </div>
         <div  ng-if="calculator.should_show()">
             <div id="champion_info">
                 <div>
@@ -63,12 +67,26 @@
                                 <td>Armor</td>
                                 <td>{{ calculator.round(calculator.getChampion().getArmor()) }}</td>
                                 <td id="table_space"></td>
-                                <td>Attack Damage</td>
-                                <td>{{ calculator.round(calculator.getChampion().getAD()) }}</td>
+                                <td>Magic Resist</td>
+                                <td>{{ calculator.round(calculator.getChampion().getMR()) }}</td>
                             </tr>
                             <tr>
-                                <td>Range</td>
-                                <td>{{ calculator.round(calculator.getChampion().getRange()) }}</td>
+                                <td>Health</td>
+                                <td>{{ calculator.round(calculator.getChampion().getHP()) }}</td>
+                                <td id="table_space"></td>
+                                <td>{{calculator.getChampion().base.partype}}</td>
+                                <td>{{ calculator.round(calculator.getChampion().getMana()) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Health Regen</td>
+                                <td>{{ calculator.round(calculator.getChampion().getHPRegen()) }}</td>
+                                <td id="table_space"></td>
+                                <td>Mana Regen</td>
+                                <td>{{ calculator.round(calculator.getChampion().getManaRegen()) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Attack Damage</td>
+                                <td>{{ calculator.round(calculator.getChampion().getAD()) }}</td>
                                 <td id="table_space"></td>
                                 <td>Attack Speed</td>
                                 <td>{{ calculator.round(calculator.getChampion().getAttackSpeed()) }}</td>
@@ -77,29 +95,36 @@
                                 <td>Crit Chance</td>
                                 <td>{{ calculator.round(calculator.getChampion().getCritChance()) * 100 + "%" }}</td>
                                 <td id="table_space"></td>
-                                <td>Health</td>
-                                <td>{{ calculator.round(calculator.getChampion().getHP()) }}</td>
+                                <td>Crit Damage</td>
+                                <td>{{ calculator.round(calculator.getChampion().getCritDamage()) * 100 + "%" }}</td>
                             </tr>
                             <tr>
-                                <td>Health Regen</td>
-                                <td>{{ calculator.round(calculator.getChampion().getHPRegen()) }}</td>
+                                <td>Range</td>
+                                <td>{{ calculator.round(calculator.getChampion().getRange()) }}</td>
                                 <td id="table_space"></td>
                                 <td>Speed</td>
                                 <td>{{ calculator.round(calculator.getChampion().getSpeed()) }}</td>
                             </tr>
                             <tr>
-                                <td>{{calculator.getChampion().base.partype}}</td>
-                                <td>{{ calculator.round(calculator.getChampion().getMana()) }}</td>
-                                <td id="table_space"></td>
-                                <td>Mana Regen</td>
-                                <td>{{ calculator.round(calculator.getChampion().getManaRegen()) }}</td>
-                            </tr>
-                            <tr>
-                                <td>Magic Resist</td>
-                                <td>{{ calculator.round(calculator.getChampion().getMR()) }}</td>
+                                <td>CDR</td>
+                                <td>{{ calculator.round(1 - calculator.round(calculator.getChampion().getCD())) * 100 + '%' }}</td>
                                 <td id="table_space"></td>
                                 <td>Ability Power</td>
                                 <td>{{ calculator.round(calculator.getChampion().getAP(true)) }}</td>
+                            </tr>
+                            <tr>
+                                <td>Life Steal</td>
+                                <td>{{ calculator.round(calculator.getChampion().getLifeSteal() * 100) + "%" }}</td>
+                                <td id="table_space"></td>
+                                <td>Spell Vamp</td>
+                                <td>{{ calculator.round(calculator.getChampion().getSpellVamp() * 100) + "%" }}</td>
+                            </tr>
+                            <tr>
+                                <td>Armor Pen</td>
+                                <td>{{ calculator.round(calculator.getChampion().getArmorPen()) }}</td>
+                                <td id="table_space"></td>
+                                <td>Magic Pen</td>
+                                <td>{{ calculator.round(calculator.getChampion().getMagicPen()) }}</td>
                             </tr>
                         </table>
                     </div>
@@ -137,6 +162,10 @@
                             </tr>
                         </table>
                         <div id="item_popup" class="popup light_blur" ng-hide="!calculator.should_show_item_popup()">
+                            <div ng-if="calculator.item_json[calculator.getChampion().state.items[calculator.active_item]].stacks" id="champ_stacks_wrapper">
+                                Stacks:
+                                <input type="number" id="item_stacks" min="0" value="0" class="stacks" ng-model="item_stacks[calculator.active_item]" ng-change="calculator.set_item_stacks(calculator.active_item, item_stacks[calculator.active_item])" ng-init="item_stacks[calculator.active_item] = 0"; max="{{calculator.item_json[calculator.getChampion().state.items[calculator.active_item]].stacks}}">
+                            </div>
                             <input type="text" id="item_search" class="search" placeholder="search" ng-model="search.item" ng-change="calculator.update_search()" align="center" spellcheck="false">
                             <div id="tbl" align="center" class="scroll">
                                 <table id="item_search_results" ng-if="calculator.showSearch()">
@@ -154,6 +183,9 @@
                             Load runes and masteries
                         </div>
                         <input id="summ_name" type="text" placeholder="Summoner name" ng-keypress="calculator.login_keypress($event)">
+                        <select id="region_select">
+                            <option ng-repeat="r in calculator.getRegions()" value="{{r.code}}" ng-selected="{{r.code == 'na'}}">{{ r.name }}</option>
+                        </select>
                         <button ng-click="calculator.lol_login()">Load</button>
                     </div>
                 </div>
@@ -163,6 +195,7 @@
                         <div id="tooltip_desc">{{calculator.items.data[calculator.getItemHover()].plaintext}}</div>
                     </div>
                     <br>
+                    {{calculator.getItemHover()}}
                     <div id="tooltip_content" class="lol_content" ng-bind-html="calculator.getItemDesc(calculator.getItemHover())">
                     </div>
                 </div>
@@ -187,17 +220,17 @@
                             </div>
                         </div>
                     </div>
-                    <div id="rune_popup" class="popup light_blur" ng-hide="!calculator.should_show_rune_popup()">
-                        <input type="text" id="rune_search" class="search" placeholder="search" ng-model="search.rune" ng-change="calculator.update_rune_search()" align="center" spellcheck="false">
-                        <div id="tbl" align="center" class="scroll">
-                            <table id="rune_search_results" ng-if="calculator.showRuneSearch()">
-                                <tr ng-repeat="i in []| range:calculator.getRuneSearchRows()">
-                                    <td ng-repeat="rune in calculator.getRuneSearchRow(i)">
-                                        <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.rune_select(rune)" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)">
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
+                </div>
+                <div id="rune_popup" class="popup light_blur" ng-hide="!calculator.should_show_rune_popup()">
+                    <input type="text" id="rune_search" class="search" placeholder="search" ng-model="search.rune" ng-change="calculator.update_rune_search()" align="center" spellcheck="false">
+                    <div id="rune_tbl" align="center" class="scroll">
+                        <table id="rune_search_results" ng-if="calculator.showRuneSearch()">
+                            <tr ng-repeat="i in []| range:calculator.getRuneSearchRows()">
+                                <td ng-repeat="rune in calculator.getRuneSearchRow(i)">
+                                    <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.rune_select(rune)" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)">
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
                 <div id="rune_tooltip" class="light_blur tooltip" ng-hide="!calculator.showRuneTooltip()">

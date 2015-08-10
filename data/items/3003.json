@@ -1,0 +1,23 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.add.ap += .03 * champion.getMana()",
+        "}"
+      ],
+      "name": "archstaffpass"
+    },
+    {
+      "unique": true,
+      "code": [
+        "return function(champion, slot){",
+        "champion.add.mana +=  calc.getItemStacks(slot)",
+        "}"
+      ],
+      "name": "tearpass"
+    }
+  ],
+  "stacks": 750
+}

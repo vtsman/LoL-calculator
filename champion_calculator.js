@@ -1,7 +1,7 @@
 /**
  * Created by Spencer on 7/11/15.
  */
-api_url="http://127.0.0.1:5000/"
+api_url="http://104.130.8.162:1081"
 
 app = angular.module('build', ['ngAnimate', 'ngSanitize']);
 
@@ -48,6 +48,8 @@ var runes = undefined;
 
 var calc = undefined;
 
+var src_width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+
 app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce) {
     var calculator = this;
     calc = this;
@@ -63,7 +65,21 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     calculator.rune_coords = undefined;
     calculator.active_rune = -1;
     calculator.masteries = undefined;
+    calculator.item_json = [];
     var current_version = "5.14.1";
+
+    $scope.item_stacks = [];
+
+    calculator.getItemStacks = function(slot){
+        if($scope.item_stacks[slot] == undefined){
+            $scope.item_stacks[slot] = 0;
+        }
+        return $scope.item_stacks[slot];
+    }
+
+    calculator.getCurrentItemStacks = function(){
+        return calculator.getItemStacks(calculator.active_item);
+    }
 
     var loadChamp = function(id){
         console.log($sce)
@@ -101,11 +117,13 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                             blur();
                         }
                     ).fail(function (error) {
+                            error = "Unable to load masteries";
                             console.log(error)
                         });
                 })
             }
         ).fail(function (error) {
+                error = "Unable to load champion";
                 console.log(error)
             });
     }
@@ -125,6 +143,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 calculator.apply();
             }
         ).fail(function (error) {
+                error = "Unable to load items";
                 console.log(error)
             });
         $.getJSON( "champKeys.json", function( data ) {
@@ -141,6 +160,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                     calculator.apply();
                 }
             ).fail(function (error) {
+                    error = "Unable to load champion list";
                     console.log(error)
                 });
         });
@@ -162,6 +182,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 calculator.apply();
             }
         ).fail(function (error) {
+                error = "Unable to load runes";
                 console.log(error)
             });
 
@@ -175,6 +196,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 console.log(current_version)
             }
         ).fail(function (error) {
+                error = "Unable to get current league version";
                 console.log(error)
             });
     }
@@ -422,7 +444,28 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         var text = $('#champion_header_text');
 
         icon.height(text.height());
+
+        var runes = $('#build_runes');
+
+        if(src_width < 545){
+            runes.css("zoom", (src_width - 40) / 6.56 + "%");
+        }
     }
+
+    $( window ).resize(function() {
+        src_width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+
+        var runes = $('#build_runes');
+
+        if(src_width < 545){
+            runes.css("zoom", (src_width - 40) / 6.56 + "%");
+        }
+        else{
+            runes.css("zoom", 100 + "%");
+        }
+
+        blur()
+    });
 
     calculator.should_show_item_popup = function(){
         return calculator.active_item != -1
@@ -557,14 +600,13 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             return "";
         }
         var xoff = 59;
-        var yoff = 0;
+        var yoff = 20;
         if(rune != -1){
             if($.inArray("quintessence" ,calculator.runes.data[rune].tags) > -1){
-                xoff = 60;
-                yoff = 5;
+                xoff = 65;
+                yoff = 15;
             }
             else{
-                console.log("here")
                 xoff = 55;
                 yoff = 20;
             }
@@ -581,10 +623,12 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }
         else{
             calculator.active_rune = rune;
-            t.css({
-                left: mouse_loc.x - t.width() - 13,
-                top: mouse_loc.y + 10
-            });
+            if(src_width > 800){
+                t.css({
+                    left: mouse_loc.x - t.width() - 13,
+                    top: mouse_loc.y + 10
+                });
+            }
             update_rune_search_common($("#rune_search")[0].value)
             setTimeout(function(){$("#rune_search")[0].focus();}, 10);
         }
@@ -777,24 +821,6 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         if(calculator.masteries.data[id].tier != undefined){
             return calculator.masteries.data[id].tier;
         }
-        /*var treeName = calculator.masteries.data[id].masteryTree;
-        var tree = calculator.masteries.tree[treeName];
-        var out = 0;
-        for(var key in tree){
-            row = tree[key].masteryTreeItems;
-            for(var mKey in row){
-                m = row[mKey];
-                if(m == null){
-                    continue;
-                }
-                if(m.masteryId == id){
-                    calculator.masteries.data[id].tier = out;
-                    return out;
-                }
-            }
-            out++;
-        }*/
-        //TODO see if this is all that hacky
         return parseInt(id.toString().substr(2, 1)) - 1
     }
 
@@ -828,41 +854,48 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
 
     calculator.lol_login = function(){
         var name = $("#summ_name")[0].value;
+        var region = $("#region_select")[0].value;
         if(name == ""){
+            error = "No summoner name specified"
             return;
         }
         $.ajax({
             method: "GET",
-            url: api_url + "api/lol/na/v1.4/summoner/by-name/" + name,
+            url: api_url + "api/lol/" + region + "/v1.4/summoner/by-name/" + name,
             async: 'true'
         }).done(
             function (data) {
-                var id = JSON.parse(data)[name.split(" ").join("")].id;
+                var id = JSON.parse(data)[name.split(" ").join("").toLocaleLowerCase()].id;
                 $.ajax({
                     method: "GET",
-                    url: api_url + "api/lol/na/v1.4/summoner/" + id + "/masteries",
+                    url: api_url + "api/lol/" + region + "/v1.4/summoner/" + id + "/masteries",
                     async: 'true'
                 }).done(
                     function (data) {
+                        console.log(data);
                         calculator.summ_masteries = JSON.parse(data)[id].pages;
                         $.ajax({
                             method: "GET",
-                            url: api_url + "api/lol/na/v1.4/summoner/" + id + "/runes",
+                            url: api_url + "api/lol/" + region + "/v1.4/summoner/" + id + "/runes",
                             async: 'true'
                         }).done(
                             function (data) {
                                 calculator.summ_runes = JSON.parse(data)[id].pages;
+                                error = undefined;
                                 $scope.$apply();
                             }
                         ).fail(function (error) {
+                                error = "Unable to load summoner runes";
                                 console.log(error)
                             });
                     }
                 ).fail(function (error) {
+                        error = "Unable to load summoner masteries";
                         console.log(error)
                     });
             }
         ).fail(function (error) {
+                error = "Unable to find summoner";
                 console.log(error)
             });
     }
@@ -891,19 +924,53 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }
     }
 
-    calculator.apply_masteries = function(){
+    calculator.apply_masteries = function() {
         var val = $("#mastery_select")[0].value - 1;
-        if(val == -1){
-            for(var key in calculator.masteries.data){
-                calculator.getChampion().state.mastery_levels[key] = 0;
-            }
+
+        for (var key in calculator.masteries.data) {
+            calculator.getChampion().state.mastery_levels[key] = 0;
         }
-        else{
-            for(var index in calculator.summ_masteries[val].masteries){
+
+        if (val != -1) {
+            for (var index in calculator.summ_masteries[val].masteries) {
                 var mast = calculator.summ_masteries[val].masteries[index];
                 calculator.getChampion().state.mastery_levels[mast.id] = mast.rank;
             }
         }
+    }
+
+    var error = undefined;
+
+    calculator.showError = function(){
+        if(error != undefined){
+            setTimeout(function(){
+                error = undefined;
+                $scope.$apply();
+            }, 5000)
+        }
+        return error != undefined;
+    }
+
+    calculator.getError = function(){
+        return error;
+    }
+
+    var regions = [
+        {code: "br", name: "Brazil"},
+        {code: "eune", name: "EU Nordic & East"},
+        {code: "euw", name: "EU West"},
+        {code: "kr", name: "Korea"},
+        {code: "lan", name: "Latin America North"},
+        {code: "lac", name: "Latin America South"},
+        {code: "na", name: "North America"},
+        {code: "oce", name: "Oceana"},
+        {code: "pbe", name: "Public Beta Environment"},
+        {code: "ru", name: "Russia"},
+        {code: "tr", name: "Turkey"}
+    ]
+
+    calculator.getRegions = function(){
+        return regions;
     }
 }]);
 

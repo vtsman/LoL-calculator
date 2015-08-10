@@ -1,0 +1,13 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.add.critDamage += .5",
+        "}"
+      ],
+      "name": "iepass"
+    }
+  ]
+}

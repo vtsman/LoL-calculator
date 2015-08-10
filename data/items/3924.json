@@ -1,0 +1,14 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion, slot){",
+        "champion.add.ad += calc.getItemStacks(slot)",
+        "}"
+      ],
+      "name": "flesheaterpass"
+    }
+  ],
+  "stacks": 100000000000
+}

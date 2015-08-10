@@ -1,0 +1,22 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.cd -= .1",
+        "}"
+      ],
+      "name": "brutcdpass"
+    },
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.add.armorPen += 10",
+        "}"
+      ],
+      "name": "brutarmorpenpass"
+    }
+  ]
+}

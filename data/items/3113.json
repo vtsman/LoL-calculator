@@ -1,0 +1,13 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.mult.speed *= 1.05",
+        "}"
+      ],
+      "name": "glacialpass"
+    }
+  ]
+}

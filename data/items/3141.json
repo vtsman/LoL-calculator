@@ -1,0 +1,17 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion, slot){",
+        "champion.add.ap += calc.getItemStacks(slot) * 5",
+        "if(calc.getItemStacks(slot) == 20){",
+        "champion.mult.attackSpeed *= 1.2",
+        "}"
+        "}"
+      ],
+      "name": "occultpass"
+    }
+  ],
+  "stacks": 20
+}

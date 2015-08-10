@@ -1,0 +1,16 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion, slot){",
+        "champion.add.mana += calc.getItemStacks(slot) * 20",
+        "champion.add.health += calc.getItemStacks(slot) * 20",
+        "champion.add.ap += calc.getItemStacks(slot) * 2",
+        "}"
+      ],
+      "name": "roapass"
+    }
+  ],
+  "stacks": 10
+}

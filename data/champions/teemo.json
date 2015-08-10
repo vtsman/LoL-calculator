@@ -22,7 +22,11 @@
       ]
     },
     {
-      "vars":{},
+      "vars":{
+        "f1": [
+          "return function(champion, lvl){return 39 - 4 * lvl}"
+        ]
+      },
       "use": [
 
       ]

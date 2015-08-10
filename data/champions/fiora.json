@@ -4,25 +4,48 @@
   ],
   "abilities":[
     {
-      "vars":{},
+      "vars":{
+      },
       "use": [
 
       ]
     },
     {
-      "vars":{},
+      "vars":{
+        "f1": [
+          "return function(champion){return champion.getAP()}"
+        ]},
       "use": [
 
       ]
     },
     {
-      "vars":{},
+      "vars":{
+        "f4": [
+          "return function(champion, lvl){return 125 + 15 * lvl}"
+        ],
+        "f3": [
+          "return function(champion, lvl){return champion.getAD() * (1.25 + .15 * lvl)}"
+        ]
+      },
       "use": [
 
       ]
     },
     {
-      "vars":{},
+      "vars":{
+        "f9": [
+          "return function(champion){return champion.getAD() * .6}"
+        ],
+        "f6": [
+          "return function(champion, lvl){return 20 + 10 * lvl}"
+        ],
+        "f8": [
+          "return function(champion){",
+          "return 12 + 4 * (Math.floor((champion.getAD() - champion.getBaseAD()) / 100) * 2.7 + .1 * champion.level)",
+          "}"
+        ]
+      },
       "use": [
 
       ]

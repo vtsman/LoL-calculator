@@ -29,7 +29,9 @@ var Champion = function(riot_json, custom_json){
     }
 
     this.internal = {
-        mast_calc: false
+        mast_calc: false,
+        passives: [],
+        passive_calc: false
     }
 
     this.resetStats()
@@ -73,6 +75,10 @@ Champion.prototype.resetStats = function () {
     this.mult.ap = 1;
 
     this.add.lifeSteal = 0;
+    this.mult.lifeSteal = 1;
+
+    this.add.spellVamp = 0;
+    this.mult.spellVamp = 1;
 
     this.add.magicPen = 0;
     this.mult.magicPen = 1;
@@ -80,8 +86,8 @@ Champion.prototype.resetStats = function () {
     this.add.armorPen = 0;
     this.mult.armorPen = 1;
 
-    this.add.critDamage = 0;
-    this.mult.critDamage = 2;
+    this.add.critDamage = 2;
+    this.mult.critDamage = 1;
 
     this.add.damageDealt = 0;
     this.mult.damageDealt = 1;
@@ -96,6 +102,8 @@ Champion.prototype.resetStats = function () {
     this.mult.apDamageTaken = 1;
 
     this.cd = 1;
+
+    this.internal.passives = []
 }
 
 Champion.prototype.calculateBuild = function(){
@@ -243,7 +251,7 @@ calculateMasteries = function(self){
 }
 
 calculateItems = function(self){
-    self.getItems().forEach(function(id){
+    self.getItems().forEach(function(id, index){
         if(id == 0){
             return;
         }
@@ -270,6 +278,7 @@ calculateItems = function(self){
                 default: console.log(key); break;
             }
         }
+        compute_item_passive(id, self, index);
     })
 }
 
@@ -381,6 +390,26 @@ Champion.prototype.getAP = function(){
 Champion.prototype.getCD = function(){
     this.calculateBuild();
     return this.cd > .6 ? this.cd:.6;
+}
+
+Champion.prototype.getLifeSteal = function(){
+    return this.add.lifeSteal * this.mult.lifeSteal;
+}
+
+Champion.prototype.getSpellVamp = function(){
+    return this.add.spellVamp * this.mult.spellVamp;
+}
+
+Champion.prototype.getMagicPen = function(){
+    return this.add.magicPen * this.mult.magicPen;
+}
+
+Champion.prototype.getArmorPen = function(){
+    return this.add.armorPen * this.mult.armorPen;
+}
+
+Champion.prototype.getCritDamage = function(){
+    return this.add.critDamage * this.mult.critDamage;
 }
 
 Champion.prototype.getSpell = function(index){
@@ -548,4 +577,44 @@ parse_spell = function(champ, spell, ind){
     }
 
     return output;
+}
+
+var passives = [];
+var inprog = [];
+
+var compute_item_passive = function(id, champ, slot) {
+    if(champ.internal.passive_calc){
+        return;
+    }
+    champ.internal.passive_calc = true;
+    if (passives[id] !== undefined) {
+        var p = passives[id];
+        if (p === null) {
+            return;
+        }
+        for (var ind in p) {
+            var pass = p[ind];
+            if ($.inArray(pass.name, champ.internal.passives) > -1 && pass.unique) {
+                return;
+            }
+            else {
+                json_func(pass.code)(champ, slot);
+                champ.internal.passives.push(pass.name);
+            }
+        }
+    }
+    else if(inprog[id] == undefined){
+        inprog[id] = true;
+        $.getJSON( "data/items/" + id + ".json", function( data ) {
+            console.log(data)
+            calc.item_json[id] = data;
+            passives[id] = data.passives;
+            inprog[id] = undefined;
+            calc.apply()
+        }).fail(function(){
+            passives[id] = null;
+            inprog[id] = undefined;
+        });
+    }
+    champ.internal.passive_calc = false;
 }

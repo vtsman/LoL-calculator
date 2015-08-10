@@ -1,0 +1,31 @@
+#champion_info{
+    float: left;
+    width: 100%;
+}
+
+#build_runes{
+
+}
+
+#build{
+    text-align: center;
+}
+
+.popup{
+    z-index: 500;
+}
+
+.enabled.item{
+    z-index: 550;
+}
+
+#rune_popup{
+    position: relative;
+    display: inline;
+    max-width: 200px !important;
+    text-align: center !important;
+}
+
+#rune_tbl{
+
+}

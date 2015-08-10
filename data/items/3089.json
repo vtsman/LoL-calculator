@@ -1,0 +1,13 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.mult.ap *= 1.35",
+        "}"
+      ],
+      "name": "deathcappass"
+    }
+  ]
+}
