@@ -1,7 +1,7 @@
 /**
  * Created by Spencer on 7/11/15.
  */
-api_url="http://104.130.8.162:1081"
+api_url="http://104.130.8.162:1081/"
 
 app = angular.module('build', ['ngAnimate', 'ngSanitize']);
 
