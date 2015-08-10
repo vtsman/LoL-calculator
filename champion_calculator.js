@@ -6,7 +6,8 @@ api_url="http://127.0.0.1:5000/"
 app = angular.module('build', ['ngAnimate', 'ngSanitize']);
 
 $(function() {
-    url = "url(bg/" + getRandomInt(1, 2) + ".jpg)"
+    url = "url(bg/" + getRandomInt(1, 3) + ".jpg)"
+    //$.jStorage.set("bg", url)
     $("body").css("background-image", url);
 });
 
@@ -33,10 +34,6 @@ $(document).on('mousemove', function(e){
         });
     })
 });
-
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
 function getUrlVars() {
     var vars = {};
@@ -67,7 +64,6 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     calculator.active_rune = -1;
     calculator.masteries = undefined;
     var current_version = "5.14.1";
-    calculator.mastery_levels = {};
 
     var loadChamp = function(id){
         console.log($sce)
@@ -82,8 +78,31 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 $.getJSON("data/champions/" + current_champion_api.key.toLowerCase() + ".json", function(cust){
                     current_champion = new Champion(current_champion_api, cust);
                     console.log(current_champion);
-                    calculator.apply();
-                    blur();
+                    $.ajax({
+                        method: "GET",
+                        url: api_url + "api/lol/static-data/na/v1.2/mastery",
+                        data: {"masteryListData": "all"},
+                        async: 'true'
+                    }).done(
+                        function (data) {
+                            calculator.masteries = JSON.parse(data);
+                            for(var key in calculator.masteries.data){
+                                calculator.getChampion().state.mastery_levels[key] = 0;
+                            }
+
+                            for(var key in calculator.masteries.data){
+                                var prereq = parseInt(calculator.masteries.data[key].prereq);
+                                if(prereq > 0){
+                                    calculator.masteries.data[prereq].req = key;
+                                }
+                            }
+                            console.log(calculator.masteries)
+                            calculator.apply();
+                            blur();
+                        }
+                    ).fail(function (error) {
+                            console.log(error)
+                        });
                 })
             }
         ).fail(function (error) {
@@ -140,31 +159,6 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             function (data) {
                 calculator.runes = JSON.parse(data);
                 runes = calculator.runes
-                calculator.apply();
-            }
-        ).fail(function (error) {
-                console.log(error)
-            });
-
-        $.ajax({
-            method: "GET",
-            url: api_url + "api/lol/static-data/na/v1.2/mastery",
-            data: {"masteryListData": "all"},
-            async: 'true'
-        }).done(
-            function (data) {
-                calculator.masteries = JSON.parse(data);
-                for(var key in calculator.masteries.data){
-                    calculator.mastery_levels[key] = 0;
-                }
-
-                for(var key in calculator.masteries.data){
-                    var prereq = parseInt(calculator.masteries.data[key].prereq);
-                    if(prereq > 0){
-                        calculator.masteries.data[prereq].req = key;
-                    }
-                }
-                console.log(calculator.masteries)
                 calculator.apply();
             }
         ).fail(function (error) {
@@ -272,7 +266,9 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 })
             }
         }
-        return out;
+        return out.sort(function(a, b){
+            return calculator.items.data[b].gold.total - calculator.items.data[a].gold.total
+        });
     };
 
     var searchChamps = function(term){
@@ -319,7 +315,13 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 })
             }
         }
-        return out;
+
+        return out.sort(function(a, b){
+            if(a.name.toLowerCase() > b.name.toLowerCase()){
+                return 1;
+            }
+            return -1;
+        });
     };
 
     var searchRunes = function(term, mand_key){
@@ -398,10 +400,13 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         var src = event.srcElement || event.target
         clicked = parseInt(src.id.substr(src.id.length - 1))
         if(calculator.active_item != clicked){
+            $("#item_button" + calculator.active_item).removeClass("selected");
             calculator.active_item = clicked;
+            $("#item_button" + clicked).addClass("selected");
             setTimeout(function(){$("#item_search")[0].focus();}, 10);
         }
         else{
+            $("#item_button" + clicked).removeClass("selected");
             calculator.active_item = -1;
         }
     }
@@ -468,6 +473,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 current_champion.state.items[calculator.active_item] = item;
             }
         }
+        $("#item_button" + calculator.active_item).removeClass("selected");
         calculator.active_item = -1
     }
 
@@ -645,25 +651,25 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         if(calculator.get_mastery_points() == 30){
             return;
         }
-        if(calculator.mastery_levels[id] < calculator.masteries.data[id].ranks){
+        if(calculator.getChampion().state.mastery_levels[id] < calculator.masteries.data[id].ranks){
             if(calculator.mastery_avail(id)){
-                calculator.mastery_levels[id]++;
+                calculator.getChampion().state.mastery_levels[id]++;
             }
         }
     }
 
     calculator.decMastery = function(id){
-        if(calculator.mastery_levels[id] > 0){
+        if(calculator.getChampion().state.mastery_levels[id] > 0){
             var tree = calculator.masteries.data[id].masteryTree;
             if(!calculator.check_mast_dec(id)){
                 return;
             }
             if(calculator.masteries.data[id].req != undefined){
-                if(calculator.mastery_levels[calculator.masteries.data[id].req] > 0){
+                if(calculator.getChampion().state.mastery_levels[calculator.masteries.data[id].req] > 0){
                     return;
                 }
             }
-            calculator.mastery_levels[id]--;
+            calculator.getChampion().state.mastery_levels[id]--;
         }
     }
 
@@ -690,7 +696,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 if(m == null){
                     continue;
                 }
-                rTot += calculator.mastery_levels[m.masteryId]
+                rTot += calculator.getChampion().state.mastery_levels[m.masteryId]
             }
             if(rTot == 0){
                 return out - 1;
@@ -713,7 +719,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 if(m == null){
                     continue;
                 }
-                out += calculator.mastery_levels[m.masteryId]
+                out += calculator.getChampion().state.mastery_levels[m.masteryId]
             }
             if(r == tier){
                 return out;
@@ -724,9 +730,10 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
 
     calculator.get_mastery_tree_points = function(tree){
         var out = 0;
-        for(var key in calculator.mastery_levels){
+        //debugger;
+        for(var key in calculator.getChampion().state.mastery_levels){
             if(calculator.masteries.data[key].masteryTree == tree)
-                out += calculator.mastery_levels[key];
+                out += calculator.getChampion().state.mastery_levels[key];
         }
         return out;
     }
@@ -740,7 +747,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }
         var prereq = parseInt(calculator.masteries.data[mastery].prereq);
         if(prereq != 0){
-            if(calculator.masteries.data[prereq].ranks != calculator.mastery_levels[prereq]){
+            if(calculator.masteries.data[prereq].ranks != calculator.getChampion().state.mastery_levels[prereq]){
                 return false;
             }
         }
@@ -749,7 +756,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
 
     calculator.get_mast_class_string = function(id){
         var out = "mastery clickable";
-        if(calculator.mastery_levels[id] == 0){
+        if(calculator.getChampion().state.mastery_levels[id] == 0){
             if(calculator.mastery_avail(id)){
                 out += " partsat"
             }
@@ -793,8 +800,8 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
 
     calculator.get_mastery_points = function(){
         var out = 0;
-        for(var key in calculator.mastery_levels){
-            out += calculator.mastery_levels[key];
+        for(var key in calculator.getChampion().state.mastery_levels){
+            out += calculator.getChampion().state.mastery_levels[key];
         }
         return out;
     }
@@ -806,13 +813,97 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         if(id == -1){
             return;
         }
-        if(calculator.mastery_levels[id] == 0){
+        if(calculator.getChampion().state.mastery_levels[id] == 0){
             return "";
         }
         if(calculator.masteries.data[id] == undefined){
             return "";
         }
-        return calculator.masteries.data[id].sanitizedDescription[calculator.mastery_levels[id] - 1];
+        return calculator.masteries.data[id].sanitizedDescription[calculator.getChampion().state.mastery_levels[id] - 1];
+    }
+
+    calculator.getChampStacks = function(){
+        return parseInt($("#champ_stacks")[0].value);
+    }
+
+    calculator.lol_login = function(){
+        var name = $("#summ_name")[0].value;
+        if(name == ""){
+            return;
+        }
+        $.ajax({
+            method: "GET",
+            url: api_url + "api/lol/na/v1.4/summoner/by-name/" + name,
+            async: 'true'
+        }).done(
+            function (data) {
+                var id = JSON.parse(data)[name.split(" ").join("")].id;
+                $.ajax({
+                    method: "GET",
+                    url: api_url + "api/lol/na/v1.4/summoner/" + id + "/masteries",
+                    async: 'true'
+                }).done(
+                    function (data) {
+                        calculator.summ_masteries = JSON.parse(data)[id].pages;
+                        $.ajax({
+                            method: "GET",
+                            url: api_url + "api/lol/na/v1.4/summoner/" + id + "/runes",
+                            async: 'true'
+                        }).done(
+                            function (data) {
+                                calculator.summ_runes = JSON.parse(data)[id].pages;
+                                $scope.$apply();
+                            }
+                        ).fail(function (error) {
+                                console.log(error)
+                            });
+                    }
+                ).fail(function (error) {
+                        console.log(error)
+                    });
+            }
+        ).fail(function (error) {
+                console.log(error)
+            });
+    }
+
+    calculator.login_keypress = function(event){
+        keyCode = event.which || event.keyCode;
+        if (keyCode === 13) {
+            calculator.lol_login()
+        }
+    }
+
+    calculator.summ_logged = function(){
+        return calculator.summ_runes != undefined;
+    }
+
+    calculator.apply_runes = function(){
+        var val = $("#rune_select")[0].value - 1;
+        if(val == -1){
+            calculator.getChampion().state.runes = [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1];
+        }
+        else{
+            for(var index in calculator.summ_runes[val].slots){
+                var slot = calculator.summ_runes[val].slots[index].runeSlotId - 1;
+                calculator.getChampion().state.runes[slot] = calculator.summ_runes[val].slots[index].runeId;
+            }
+        }
+    }
+
+    calculator.apply_masteries = function(){
+        var val = $("#mastery_select")[0].value - 1;
+        if(val == -1){
+            for(var key in calculator.masteries.data){
+                calculator.getChampion().state.mastery_levels[key] = 0;
+            }
+        }
+        else{
+            for(var index in calculator.summ_masteries[val].masteries){
+                var mast = calculator.summ_masteries[val].masteries[index];
+                calculator.getChampion().state.mastery_levels[mast.id] = mast.rank;
+            }
+        }
     }
 }]);
 
@@ -866,7 +957,7 @@ app.directive('mastery', function($compile) {
                 'ng-if':"mastery != null"
             })
 
-            $(".mastery_counter").text("{{calculator.mastery_levels[mastery.masteryId] + '/' + calculator.masteries.data[mastery.masteryId].ranks}}")
+            $(".mastery_counter").text("{{calculator.getChampion().state.mastery_levels[mastery.masteryId] + '/' + calculator.masteries.data[mastery.masteryId].ranks}}")
 
             var pt_counter = $($($element.children()[0]).children()[1]);
 

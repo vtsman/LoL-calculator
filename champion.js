@@ -1,6 +1,8 @@
 /**
  * Created by Spencer on 7/14/15.
  */
+
+    //TODO Fix teemo and fiora stats
 var Champion = function(riot_json, custom_json){
     this.level = 0;
     this.base = riot_json;
@@ -10,6 +12,9 @@ var Champion = function(riot_json, custom_json){
 
     this.supp_json = custom_json;
 
+    if($("#champ_stacks").length > 0){
+        $("#champ_stacks")[0].value = 0;
+    }
 
     this.add = {};
     this.mult = {};
@@ -19,7 +24,12 @@ var Champion = function(riot_json, custom_json){
         buffs: [],
         items: [0, 0, 0, 0, 0, 0],
         levels: [0, 0, 0, 0],
-        runes: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+        runes: [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
+        mastery_levels: {}
+    }
+
+    this.internal = {
+        mast_calc: false
     }
 
     this.resetStats()
@@ -88,18 +98,13 @@ Champion.prototype.resetStats = function () {
     this.cd = 1;
 }
 
-Champion.prototype.calculateBuild = function(masteries_enabled){
-    //FIXME calling with masteries_enabled as false disables masteries in gui
-    if(typeof(masteries_enabled) === 'undefined'){
-        masteries_enabled = true;
-    }
+Champion.prototype.calculateBuild = function(){
     this.resetStats()
     calculateRunes(this);
     calculateItems(this);
-    if(masteries_enabled){
+    if(!this.internal.mast_calc){
         calculateMasteries(this);
     }
-    masteries_enabled = true;
 }
 
 calculateRunes = function(self){
@@ -152,8 +157,10 @@ calculateRunes = function(self){
 }
 
 calculateMasteries = function(self){
-    for(var key in calc.mastery_levels){
-        var lvl = calc.mastery_levels[key];
+    self.internal.mast_calc = true;
+    var tempChamp = $.extend(true, {}, self);
+    for(var key in self.state.mastery_levels){
+        var lvl = self.state.mastery_levels[key];
         if(lvl != 0){
             switch(parseInt(key)){
                 case 4111: break; //TODO implement double edged sword
@@ -182,7 +189,7 @@ calculateMasteries = function(self){
                 case 4144: break; //TODO implement dangerous game
                 case 4151: break; //TODO implement frenzy
                 case 4152: self.mult.magicPen *= 1 + 0.02 * lvl; self.mult.armorPen *= 1 + 0.02 * lvl; break;
-                case 4154: self.add.ad += self.getAP(false) / (20 * self.mult.ad); break;
+                case 4154: self.add.ad += tempChamp.getAP() / (20); break;
                 case 4162: self.mult.ad *= 1.03; self.mult.ap *= 1.03; break;
                 //Defense
                 case 4211: self.add.adDamageTaken -= lvl;
@@ -197,16 +204,16 @@ calculateMasteries = function(self){
                 case 4233: self.add.armor += .5 + 1.5 * lvl; break;
                 case 4234: self.add.mr += .5 + 1.5 * lvl; break;
                 case 4241: break; //TODO implement perseverance
-                case 4242: if(self.getMR(false) > self.getArmor(false)){
-                    self.add.armor += 2 * self.getArmor(false) / (50 * self.mult.armor);
+                case 4242: if(self.getMR() > tempChamp.getArmor()){
+                    self.add.armor += 2 * tempChamp.getArmor() / (50 * self.mult.armor);
                 } else{
-                    self.add.mr += 2 * self.getMR(false) / (50 * self.mult.mr);
+                    self.add.mr += 2 * tempChamp.getMR() / (50 * self.mult.mr);
                 }; break; //FIXME removes other mastery effects
                 case 4243: break; //TODO implement reinforced armor
                 case 4244: break; //TODO implement evasive
                 case 4251: break; //TODO implement second wind
-                case 4252: self.add.armor += lvl * self.getArmor(false) / (40 * self.mult.armor);
-                    self.add.mr += lvl * self.getMR(false) / (40 * self.mult.mr); break;
+                case 4252: self.add.armor += lvl * tempChamp.getArmor() / (40 * self.mult.armor);
+                    self.add.mr += lvl * tempChamp.getMR() / (40 * self.mult.mr); break;
                 case 4253: break; //TODO implement oppression
                 case 4262: break; //TODO implement legendary gaurdian
                 //Util
@@ -215,7 +222,7 @@ calculateMasteries = function(self){
                 case 4313: self.add.mana += 25 * lvl; break;
                 case 4314: break; //TODO implement scout
                 case 4322: break; //TODO implement Summoner's insight
-                case 4323: self.add.hpRegen += self.getMana(false) / 300; break;
+                case 4323: self.add.hpRegen += tempChamp.getMana() / 300; break;
                 case 4324: break; //TODO implement alchemist
                 case 4331: break; //TODO implement greed
                 case 4332: break; //TODO implement runic affinity
@@ -232,6 +239,7 @@ calculateMasteries = function(self){
             }
         }
     }
+    self.internal.mast_calc = false;
 }
 
 calculateItems = function(self){
@@ -269,8 +277,8 @@ Champion.prototype.getBaseArmor = function(){
     return (this.base.stats.armor + (this.base.stats.armorperlevel * this.level))
 }
 
-Champion.prototype.getArmor = function(masteries){
-    this.calculateBuild(masteries);
+Champion.prototype.getArmor = function(){
+    this.calculateBuild();
     return (this.getBaseArmor() + this.add.armor) * this.mult.armor
 }
 
@@ -278,8 +286,8 @@ Champion.prototype.getBaseAD = function () {
     return (this.base.stats.attackdamage + (this.base.stats.attackdamageperlevel * this.level))
 }
 
-Champion.prototype.getAD = function(masteries){
-    this.calculateBuild(masteries);
+Champion.prototype.getAD = function(){
+    this.calculateBuild();
     return (this.getBaseAD() + this.add.ad) * this.mult.ad
 }
 
@@ -287,8 +295,8 @@ Champion.prototype.getBaseRange = function() {
     return (this.base.stats.attackrange)
 }
 
-Champion.prototype.getRange = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getRange = function(){
+this.calculateBuild();
     return (this.getBaseRange() + this.add.range) * this.mult.range
 }
 
@@ -296,8 +304,8 @@ Champion.prototype.getBaseAttackSpeed = function(){
     return (((0.625 / (1 + this.base.stats.attackspeedoffset)) * (1 + this.base.stats.attackspeedperlevel * this.level / 100)))
 }
 
-Champion.prototype.getAttackSpeed = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getAttackSpeed = function(){
+this.calculateBuild();
     return (this.getBaseAttackSpeed() + this.add.attackSpeed) * this.mult.attackSpeed
 }
 
@@ -305,8 +313,8 @@ Champion.prototype.getBaseCritChance = function(){
     return (this.base.stats.crit + (this.base.stats.critperlevel * this.level))
 }
 
-Champion.prototype.getCritChance = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getCritChance = function(){
+this.calculateBuild();
     return (this.getBaseCritChance() + this.add.critChance) * this.mult.critChance;
 }
 
@@ -314,8 +322,8 @@ Champion.prototype.getBaseHP = function(){
     return (this.base.stats.hp + (this.base.stats.hpperlevel * this.level))
 }
 
-Champion.prototype.getHP = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getHP = function(){
+this.calculateBuild();
     return (this.getBaseHP() + this.add.hp) * this.mult.hp
 }
 
@@ -323,8 +331,8 @@ Champion.prototype.getBaseHPRegen = function(){
     return (this.base.stats.hpregen + (this.base.stats.hpregenperlevel * this.level))
 }
 
-Champion.prototype.getHPRegen = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getHPRegen = function(){
+this.calculateBuild();
     return (this.getBaseHPRegen() + this.add.hpRegen) * this.mult.hpRegen
 }
 
@@ -332,8 +340,8 @@ Champion.prototype.getBaseSpeed = function(){
     return (this.base.stats.movespeed)
 }
 
-Champion.prototype.getSpeed = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getSpeed = function(){
+this.calculateBuild();
     return (this.getBaseSpeed() + this.add.speed) * this.mult.speed;
 }
 
@@ -341,8 +349,8 @@ Champion.prototype.getBaseMana = function(){
     return (this.base.stats.mp + (this.base.stats.mpperlevel * this.level))
 }
 
-Champion.prototype.getMana = function(masteries){
-this.calculateBuild(masteries);
+Champion.prototype.getMana = function(){
+this.calculateBuild();
     return (this.getBaseMana() + this.add.mana) * this.mult.mana;
 }
 
@@ -351,8 +359,8 @@ Champion.prototype.getBaseManaRegen = function(){
     return (this.base.stats.mpregen + (this.base.stats.mpregenperlevel * this.level))
 }
 
-Champion.prototype.getManaRegen = function(masteries){
-    this.calculateBuild(masteries);
+Champion.prototype.getManaRegen = function(){
+    this.calculateBuild();
     return (this.getBaseManaRegen() + this.add.manaRegen) * this.mult.manaRegen
 }
 
@@ -360,18 +368,18 @@ Champion.prototype.getBaseMR = function(){
     return (this.base.stats.spellblock + (this.base.stats.spellblockperlevel * this.level))
 }
 
-Champion.prototype.getMR = function(masteries){
-    this.calculateBuild(masteries);
+Champion.prototype.getMR = function(){
+    this.calculateBuild();
     return (this.getBaseMR() + this.add.mr) * this.mult.mr
 }
 
-Champion.prototype.getAP = function(masteries){
-    this.calculateBuild(masteries);
+Champion.prototype.getAP = function(){
+    this.calculateBuild();
     return this.add.ap * this.mult.ap;
 }
 
-Champion.prototype.getCD = function(masteries){
-    this.calculateBuild(masteries);
+Champion.prototype.getCD = function(){
+    this.calculateBuild();
     return this.cd > .6 ? this.cd:.6;
 }
 
@@ -413,6 +421,13 @@ Champion.prototype.getAbilityLevel = function(index){
         lvl = parseInt($("#ability_level_" + spell.key)[0].value);
     }
     return lvl;
+}
+
+Champion.prototype.getMaxStacks = function(){
+    if(this.supp_json.maxStacks != undefined){
+        return this.supp_json.maxStacks;
+    }
+    return 1000000;
 }
 
 parse_spell = function(champ, spell, ind){
@@ -498,8 +513,8 @@ parse_spell = function(champ, spell, ind){
                 case "@special.jaycew": value = 62 + 8 * lvl; co = false; break;
                 case "bonusarmor": value = champ.getArmor() - champ.getBaseArmor(); break;
                 case "bonusspellblock": value = champ.getMR() - champ.getBaseMR(); break;
-                case "@stacks": value = 0; break; //TODO implement stacks
-                case "@special.dariusr3": value = 1; break; //TODO implement darius stacks
+                case "@stacks": value = calc.getChampStacks(); break;
+                case "@special.dariusr3": value = calc.getChampStacks(); break; //TODO implement darius stacks
                 case "@special.viw": value = Math.floor((champ.getAD() - champ.getBaseAD()) / 35); break;
                 default: alert(v.link)
             }

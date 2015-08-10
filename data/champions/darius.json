@@ -27,5 +27,7 @@
 
       ]
     }
-  ]
+  ],
+  "stacks": true,
+  "maxStacks": 5
 }

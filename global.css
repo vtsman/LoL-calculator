@@ -14,6 +14,11 @@
     text-align: center;
 }
 
+a{
+    color: #B1B1B1;
+    text-decoration: none;
+}
+
 div::-webkit-scrollbar {
     display: none;
 }
@@ -42,6 +47,26 @@ select{
 
 #select{
     margin: 0;
+}
+
+#champ_stacks_wrapper{
+    display: inline-block;
+}
+
+.stacks{
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    padding: 5px;
+    border-radius: 3px;
+    border: none;
+
+    outline: rgba(128, 128, 128, .75);
+
+    background-color: rgba(255, 255, 255, 0.5);
+
+    width: 50px;
 }
 
 #champion_header{
@@ -243,7 +268,7 @@ select{
     width: 100%;
 }
 
-.search{
+input{
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
@@ -253,7 +278,9 @@ select{
     border: none;
 
     border-radius: 5px;
+}
 
+.search{
     width: calc(100% - 10px);
 }
 
@@ -383,6 +410,47 @@ select{
     position: relative;
 }
 
+.selected{
+    width: 46px;
+    height: 46px;
+
+    border: 1px solid #AAAAAA;
+}
+
+#guide_button{
+    position: absolute;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#guide_title{
+    font-size: medium !important;
+}
+
+#lol_login_panel{
+    border-radius: 5px;
+    padding: 5px;
+    display: inline-block;
+    float: right;
+    margin: 13px;
+}
+
+#build_top{
+    display: flex; /* or inline-flex */
+    flex-flow: row nowrap; /* is default: columns along the main-axis (row) and no wrapping to next lines */
+    align-items: flex-end; /* bottom */
+    flex-direction: row-reverse;
+}
+
+#rune_select{
+    position: absolute;
+    z-index: 101;
+    margin: 10px;
+}
+
 .mastery_counter{
     position: absolute;
     top: 28px;
@@ -392,4 +460,27 @@ select{
     background-color: rgba(70, 70, 70, 0.5);
     border: 1px solid #404040;
     padding: 1px;
+}
+
+#riot_footer{
+    clear: both;
+    bottom: 0;
+    width: 90%;
+    font-size: x-small;
+    padding: 5px;
+    border-radius: 3px;
+
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+html{
+    width:100vw;
+    height:100vh;
+    margin:0;
+}
+
+#wrapper{
+    position: relative;
 }

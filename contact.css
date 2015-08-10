@@ -1,0 +1,23 @@
+#name{
+    padding: 10px;
+    border-radius: 10px;
+    display: block;
+}
+
+#social_media{
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 10px;
+    display: block;
+}
+
+.icon{
+    height: 32px;
+    display: inline-block;
+}
+
+.soc_text{
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
