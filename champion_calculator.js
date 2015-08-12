@@ -51,6 +51,10 @@ var calc = undefined;
 var src_width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
 app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce) {
+    if(String.prototype.includes == undefined){
+        String.prototype.includes = String.prototype.contains;
+    }
+
     var calculator = this;
     calc = this;
     var current_champion = undefined;
