@@ -211,7 +211,7 @@
                         <div id="rune_overlay" ng-repeat="rune in calculator.getChampion().state.runes track by $index">
                             <div id="rune" style="{{calculator.getRuneStyle($index, rune)}}" ng-click="calculator.rune_click($index)" class="clickable">
                                 <div id="select" ng-if="rune == -1">
-                                    ⬢
+                                    &#x2b22;
                                 </div>
                                 <div ng-if="rune != -1">
                                     <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)" id="{{$index > 26 ? 'quint_icon':'rune_icon'}}">
