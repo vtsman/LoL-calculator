@@ -26,7 +26,12 @@ div::-webkit-scrollbar {
 body	{ background-attachment:fixed; }
 
 div{
-    font-family: helvetica;
+    font-family: deja_vu;
+}
+
+@font-face {
+    font-family: deja_vu;
+    src: url(DejaVuSans-ExtraLight.ttf);
 }
 
 select{
