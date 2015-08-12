@@ -579,8 +579,8 @@ parse_spell = function(champ, spell, ind){
     return output;
 }
 
-var passives = [];
-var inprog = [];
+var passives = {};
+var inprog = {};
 
 var compute_item_passive = function(id, champ, slot) {
     if(champ.internal.passive_calc){
@@ -615,6 +615,9 @@ var compute_item_passive = function(id, champ, slot) {
             passives[id] = null;
             inprog[id] = undefined;
         });
+    }
+    else{
+        console.log("here");
     }
     champ.internal.passive_calc = false;
 }

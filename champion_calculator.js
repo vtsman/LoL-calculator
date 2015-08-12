@@ -65,7 +65,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     calculator.rune_coords = undefined;
     calculator.active_rune = -1;
     calculator.masteries = undefined;
-    calculator.item_json = [];
+    calculator.item_json = {};
     var current_version = "5.14.1";
 
     $scope.item_stacks = [];
