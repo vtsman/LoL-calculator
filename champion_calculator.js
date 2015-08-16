@@ -425,6 +425,9 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     calculator.round = function(number){
         num = number.toString()
         var dec = num.indexOf(".")
+        if(dec == -1){
+            return num;
+        }
         if(dec + 3 < num.length){
             return num.substr(0, dec + 3)
         }
