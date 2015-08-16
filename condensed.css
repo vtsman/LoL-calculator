@@ -1,0 +1,141 @@
+#champion_info{
+    float: left;
+    width: 100%;
+}
+
+#mastery_bg, #rune_bg{
+    border-radius: 10px;
+    opacity: 0.8;
+    position: relative;
+    z-index: 10;
+}
+
+#rune_overlay{
+    position: absolute;
+    z-index: 50;
+    color: rgba(164, 164, 164, 0.51);
+
+    font-size: 65px;
+}
+
+#rune{
+    position: absolute;
+    display: inline-block;
+
+    line-height: 52px;
+    height: 52px;
+}
+
+#build_items{
+    position: relative;
+    display: inline-block;
+    float: left;
+}
+
+#rune_icon{
+    width: 48px;
+    height: 52px;
+
+}
+
+#quint_icon{
+    width: 80px;
+    height: 80px;
+}
+
+#build{
+    margin: 10px;
+}
+
+#rune_matrix{
+    position: relative;
+}
+
+#build_masteries{
+    margin-top: 10px;
+    position: relative;
+}
+
+.mastery_grid{
+    position: absolute;
+    z-index: 100;
+}
+
+.mastery_table td{
+    padding: 5px;
+}
+
+#offense_grid{
+    top: 10px;
+    left: 12px;
+}
+
+#defense_grid{
+    top: 10px;
+    left: 224px;
+}
+
+#utility_grid{
+    top: 10px;
+    left: 436px;
+}
+
+.mastery{
+    width: 38px;
+    height: 38px;
+}
+
+#build_masteries, #build_runes{
+    clear: none;
+    float: none;
+    display: inline-block;
+}
+
+#mastery_border, #rune_border{
+    padding: 5px;
+    border-radius: 10px;
+}
+
+#champ_popup_wrapper{
+    clear: none;
+    float: left;
+    position: relative;
+    width: 100%;
+}
+
+#build{
+    alignment: left;
+    float: left;
+}
+
+#lol_login_panel{
+    border-radius: 5px;
+    padding: 5px;
+    display: inline-block;
+    float: left;
+    margin: 13px;
+}
+
+#build_top{
+    display: flex; /* or inline-flex */
+    flex-flow: row nowrap; /* is default: columns along the main-axis (row) and no wrapping to next lines */
+    align-items: flex-end; /* bottom */
+    flex-direction: row;
+}
+
+#rune_select{
+    position: absolute;
+    z-index: 101;
+    margin: 10px;
+}
+
+.mastery_counter{
+    position: absolute;
+    top: 28px;
+    left: 20px;
+    display: block;
+    color: #B1B1B1;
+    background-color: rgba(70, 70, 70, 0.5);
+    border: 1px solid #404040;
+    padding: 1px;
+}

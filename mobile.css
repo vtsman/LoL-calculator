@@ -1,8 +1,3 @@
-#champion_info{
-    float: left;
-    width: 100%;
-}
-
 #build_runes{
 
 }
@@ -28,4 +23,160 @@
 
 #rune_tbl{
 
+}
+
+#bg {
+    z-index: -2;
+
+    margin: -5px -10px -10px -5px;
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    /* Preserve aspet ratio */
+    min-height: calc(100vh + 20px);
+}
+
+#mobile_select_bg{
+    background-color: rgba(0, 0, 0, .5);
+
+    z-index: -1 !important;
+
+    top: 0;
+    left: 0;
+
+    height: 100vh;
+    width: 100vw;
+
+    position: fixed;
+}
+
+#champion_stats td{
+    font-size: 32px;
+}
+
+#bg_wrap{
+    overflow: hidden;
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.search{
+    width: 50%;
+    display: inline-block;
+    height: 48px;
+
+    margin-left: auto;
+    margin-right: auto;
+    text-align:center;
+}
+
+button,
+input[type='text'],
+input[type='number'],
+textarea,
+select{
+    font-size: 24px;
+}
+
+select{
+    border-radius: 10px;
+}
+
+.lol_title{
+    font-size: 48px;
+}
+
+.lol_subtitle{
+    font-size: 32px;
+}
+
+.blank_item{
+    width: 96px;
+    height: 96px;
+    border-radius: 20px;
+}
+
+.item{
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+
+    margin-left: -50px;
+    margin-top: 3px;
+}
+
+.tbl{
+    clear: both;
+    display: inline-block;
+}
+
+#lol_login_panel{
+    position: relative;
+    clear: both;
+    border-radius: 5px;
+    padding: 5px;
+    display: block;
+    float: none;
+    margin: 13px;
+}
+
+#build_top{
+    display: inline-block;
+    text-align: center;
+}
+
+#build_items_table{
+    float: none;
+}
+
+.scroll{
+    height: auto;
+}
+
+.scroll td{
+    padding: 50px;
+    text-align: center;
+    color: #B1B1B1;
+    font-size: 24px;
+}
+
+.scroll td img{
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.selected{
+    width: 96px;
+    height: 96px;
+
+    border: none;
+}
+
+#build_items{
+    position: relative;
+    display: inline-block;
+    float: none;
+
+    margin-left: auto;
+    margin-right: auto;
+    text-align:center;
+}
+
+#champion_popup{
+    margin-top: 0px;
+    margin-left: 0px;
+}
+
+#champion_popup, #item_popup{
+    border-radius: 0px;
+    text-align: center;
+}
+
+.scroll img{
+    height: 128px;
+    width: auto;
+    border-radius: 30px !important;
 }

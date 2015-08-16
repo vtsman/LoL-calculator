@@ -1,15 +1,11 @@
 /**
  * Created by Spencer on 7/11/15.
  */
-api_url="http://104.130.8.162:1081/"
+api_url="http://build.lol:1081/"
 
 app = angular.module('build', ['ngAnimate', 'ngSanitize']);
 
-$(function() {
-    url = "url(bg/" + getRandomInt(1, 3) + ".jpg)"
-    //$.jStorage.set("bg", url)
-    $("body").css("background-image", url);
-});
+var condensed = 1400;
 
 var mouse_loc = {x: 0, y: 0}
 
@@ -51,6 +47,19 @@ var calc = undefined;
 var src_width = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
 
 app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce) {
+    $(function() {
+        //$.jStorage.set("bg", url)
+        if(!calculator.isMobile()){
+            url = "url(bg/" + getRandomInt(1, 3) + ".jpg)"
+            $("body").css("background-image", url);
+        }
+        else{
+            url = "bg/" + getRandomInt(1, 3) + ".jpg"
+            $("#bg").attr("src", url);
+            $('head').append('<link rel="stylesheet" type="text/css" href="./mobile.css">')
+        }
+    });
+
     if(String.prototype.includes == undefined){
         String.prototype.includes = String.prototype.contains;
     }
@@ -118,16 +127,16 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                             }
                             console.log(calculator.masteries)
                             calculator.apply();
-                            blur();
+                            calculator.blur();
                         }
                     ).fail(function (error) {
-                            error = "Unable to load masteries";
+                            calculator.setError("Unable to load masteries");
                             console.log(error)
                         });
                 })
             }
         ).fail(function (error) {
-                error = "Unable to load champion";
+                calculator.setError("Unable to load champion");
                 console.log(error)
             });
     }
@@ -147,7 +156,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 calculator.apply();
             }
         ).fail(function (error) {
-                error = "Unable to load items";
+                calculator.setError("Unable to load items");
                 console.log(error)
             });
         $.getJSON( "champKeys.json", function( data ) {
@@ -164,7 +173,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                     calculator.apply();
                 }
             ).fail(function (error) {
-                    error = "Unable to load champion list";
+                    calculator.setError("Unable to load champion list");
                     console.log(error)
                 });
         });
@@ -186,7 +195,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 calculator.apply();
             }
         ).fail(function (error) {
-                error = "Unable to load runes";
+                calculator.setError("Unable to load runes");
                 console.log(error)
             });
 
@@ -200,7 +209,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 console.log(current_version)
             }
         ).fail(function (error) {
-                error = "Unable to get current league version";
+                calculator.setError("Unable to get current league version");
                 console.log(error)
             });
     }
@@ -379,7 +388,9 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                 return false;
             })
         }
-        return out;
+        return out.sort(function(a, b){
+            return calculator.runes.data[b].rune.tier - calculator.runes.data[a].rune.tier
+        });
     };
 
     var pushItem = function(item, arr){
@@ -429,7 +440,8 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             $("#item_button" + calculator.active_item).removeClass("selected");
             calculator.active_item = clicked;
             $("#item_button" + clicked).addClass("selected");
-            setTimeout(function(){$("#item_search")[0].focus();}, 10);
+            if(!calculator.isMobile())
+                setTimeout(function(){$("#item_search")[0].focus();}, 10);
         }
         else{
             $("#item_button" + clicked).removeClass("selected");
@@ -468,8 +480,12 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             runes.css("zoom", 100 + "%");
         }
 
-        blur()
+        //blur()
     });
+
+    calculator.isMobile = function(){
+        return (/iPhone|iPod|iPad|Android|BlackBerry/).test(navigator.userAgent);
+    }
 
     calculator.should_show_item_popup = function(){
         return calculator.active_item != -1
@@ -480,7 +496,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     calculator.champ_popup_toggle = function(){
         popup_active *= -1
 
-        if(popup_active != -1){
+        if(popup_active != -1 && !calculator.isMobile()){
             setTimeout(function(){$("#champion_search")[0].focus();}, 10);
         }
     }
@@ -489,16 +505,21 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         return popup_active != -1
     }
 
-    var blur = function(){
+    calculator.blur = function(){
+        var src = 'body'
+        if(calculator.isMobile()){
+            src = '#bg'
+            //return;
+        }
         $(".blur").blurjs({
-            source: 'body',
+            source: src,
             overlay: 'rgba(164, 164, 164, .5)',
             //cache: true,
             //cacheKeyPrefix: 'blurjs-main-',
             radius: 20
         })
         $('.light_blur').blurjs({
-            source: 'body',
+            source: src,
             radius: 20,
             //overlay: 'rgba(75, 75, 75, .5)',
             overlay: 'rgba(225, 225, 225, .5)',
@@ -604,7 +625,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             return "";
         }
         var xoff = 59;
-        var yoff = 20;
+        var yoff = 25;
         if(rune != -1){
             if($.inArray("quintessence" ,calculator.runes.data[rune].tags) > -1){
                 xoff = 65;
@@ -612,13 +633,20 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             }
             else{
                 xoff = 55;
-                yoff = 20;
+                yoff = 25;
             }
         }
         var style = "top: " + (calculator.rune_coords[index].y + yoff) + "px; right: -" + (calculator.rune_coords[index].x + xoff) + "px"
         return style;
     }
 
+    calculator.inPopup = function(){
+        return calculator.should_show_champion_popup() || calculator.should_show_item_popup() || calculator.should_show_rune_popup()
+    }
+
+    calculator.mobileShowBody = function(){
+        return calculator.isMobile() && calculator.inPopup();
+    }
 
     calculator.rune_click = function(rune){
         t = $("#rune_popup");
@@ -627,14 +655,15 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }
         else{
             calculator.active_rune = rune;
-            if(src_width > 800){
+            if(!calculator.isMobile()){
                 t.css({
                     left: mouse_loc.x - t.width() - 13,
                     top: mouse_loc.y + 10
                 });
             }
             update_rune_search_common($("#rune_search")[0].value)
-            setTimeout(function(){$("#rune_search")[0].focus();}, 10);
+            if(!calculator.isMobile())
+                setTimeout(function(){$("#rune_search")[0].focus();}, 10);
         }
     }
 
@@ -702,6 +731,11 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         if(calculator.getChampion().state.mastery_levels[id] < calculator.masteries.data[id].ranks){
             if(calculator.mastery_avail(id)){
                 calculator.getChampion().state.mastery_levels[id]++;
+            }
+        }
+        else if(calculator.isMobile()){
+            for(var i = 0; i < calculator.masteries.data[id].ranks; i++){
+                calculator.decMastery(id)
             }
         }
     }
@@ -860,7 +894,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         var name = $("#summ_name")[0].value;
         var region = $("#region_select")[0].value;
         if(name == ""){
-            error = "No summoner name specified"
+            calculator.setError("No summoner name specified");
             return;
         }
         $.ajax({
@@ -885,21 +919,21 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
                         }).done(
                             function (data) {
                                 calculator.summ_runes = JSON.parse(data)[id].pages;
-                                error = undefined;
+                                calculator.setError(undefined);
                                 $scope.$apply();
                             }
                         ).fail(function (error) {
-                                error = "Unable to load summoner runes";
+                                calculator.setError("Unable to load summoner runes");
                                 console.log(error)
                             });
                     }
                 ).fail(function (error) {
-                        error = "Unable to load summoner masteries";
+                        calculator.setError("Unable to load summoner masteries");
                         console.log(error)
                     });
             }
         ).fail(function (error) {
-                error = "Unable to find summoner";
+                calculator.setError("Unable to find summoner");
                 console.log(error)
             });
     }
@@ -944,6 +978,10 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     }
 
     var error = undefined;
+
+    calculator.setError = function(err){
+        error = err;
+    }
 
     calculator.showError = function(){
         if(error != undefined){
