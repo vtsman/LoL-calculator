@@ -166,7 +166,7 @@
                         <div id="item_popup" class="popup light_blur" ng-hide="!calculator.should_show_item_popup()"  ng-if="!calculator.isMobile()">
                             <div ng-if="calculator.item_json[calculator.getChampion().state.items[calculator.active_item]].stacks" id="champ_stacks_wrapper">
                                 Stacks:
-                                <input type="number" pattern="\d*" id="item_stacks" min="0" value="0" class="stacks" ng-model="item_stacks[calculator.active_item]" ng-change="calculator.set_item_stacks(calculator.active_item, item_stacks[calculator.active_item])" ng-init="item_stacks[calculator.active_item] = 0"; max="{{calculator.item_json[calculator.getChampion().state.items[calculator.active_item]].stacks}}">
+                                <input type="number" pattern="\d*" id="item_stacks" min="0" value="0" class="stacks" ng-model="item_stacks[calculator.active_item]" ng-change="calculator.set_item_stacks(calculator.active_item, item_stacks[calculator.active_item])" max="{{calculator.item_json[calculator.getChampion().state.items[calculator.active_item]].stacks}}">
                             </div>
                             <input type="text" id="item_search" class="search" placeholder="search" ng-model="search.item" ng-change="calculator.update_search()" align="center" spellcheck="false">
                             <div id="tbl" align="center" class="scroll">
@@ -275,6 +275,7 @@
     <div id="mobile_selectors" ng-if="calculator.isMobile()">
         <div id="mobile_select_bg" ng-hide="!calculator.inPopup()"></div>
         <div id="champion_popup" ng-hide="!calculator.should_show_champion_popup()">
+            <img src="{{ calculator.getImage(calculator.getChampion().base.image) }}" onerror="this.src='notfound.png'" class="lol_icon champion clickable mobile_preview" ng-click="calculator.champ_popup_toggle()">
             <input type="text" id="champion_search" class="search" placeholder="search" ng-model="search.champ" ng-change="calculator.update_champion_search()" align="center" spellcheck="false">
             <div id="tbl" class="scroll" align="center">
                 <table id="champion_search_results" ng-if="calculator.showChampSearch()">
@@ -304,7 +305,7 @@
         </div>
         <div id="rune_popup" ng-hide="!calculator.should_show_rune_popup()">
             <input type="text" id="rune_search" class="search" placeholder="search" ng-model="search.rune" ng-change="calculator.update_rune_search()" align="center" spellcheck="false">
-            <div id="rune_tbl" align="center" class="scroll">
+            <div id="tbl" align="center" class="scroll">
                 <table id="rune_search_results" ng-if="calculator.showRuneSearch()">
                     <tr ng-repeat="i in []| range:calculator.getRuneSearchRows()">
                         <td ng-repeat="rune in calculator.getRuneSearchRow(i)">

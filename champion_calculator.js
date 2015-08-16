@@ -81,7 +81,9 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     calculator.item_json = {};
     var current_version = "5.14.1";
 
-    $scope.item_stacks = [];
+    calculator.scope = $scope;
+
+    $scope.item_stacks = [0, 0, 0, 0, 0, 0];
 
     calculator.getItemStacks = function(slot){
         if($scope.item_stacks[slot] == undefined){
@@ -421,7 +423,14 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
     }
 
     calculator.round = function(number){
-        return +(number.toFixed(3));
+        num = number.toString()
+        var dec = num.indexOf(".")
+        if(dec + 3 < num.length){
+            return num.substr(0, dec + 3)
+        }
+        else{
+            return num;
+        }
     }
 
     calculator.get_points_used = function(){
@@ -669,6 +678,10 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
 
     calculator.rune_select = function(rune){
         calculator.getChampion().state.runes[calculator.active_rune] = rune;
+        calculator.active_rune = -1;
+    }
+
+    calculator.close_rune_popup = function(){
         calculator.active_rune = -1;
     }
 

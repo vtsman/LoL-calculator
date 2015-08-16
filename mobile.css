@@ -73,6 +73,10 @@
     text-align:center;
 }
 
+#rune_popup{
+    text-align: center;
+}
+
 button,
 input[type='text'],
 input[type='number'],
@@ -106,6 +110,14 @@ select{
 
     margin-left: -50px;
     margin-top: 3px;
+}
+
+.mobile_preview{
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 96px;
+    height: 96px;
 }
 
 .tbl{

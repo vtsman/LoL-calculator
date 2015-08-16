@@ -7,7 +7,7 @@
         "champion.add.ap += calc.getItemStacks(slot) * 8",
         "if(calc.getItemStacks(slot) == 20){",
         "champion.cd -= .15",
-        "}"
+        "}",
         "}"
       ],
       "name": "mejaipass"

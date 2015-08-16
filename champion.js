@@ -580,7 +580,6 @@ parse_spell = function(champ, spell, ind){
 }
 
 var passives = {};
-var inprog = {};
 
 var compute_item_passive = function(id, champ, slot) {
     if(champ.internal.passive_calc){
@@ -590,11 +589,13 @@ var compute_item_passive = function(id, champ, slot) {
     if (passives[id] !== undefined) {
         var p = passives[id];
         if (p === null) {
+            champ.internal.passive_calc = false;
             return;
         }
         for (var ind in p) {
             var pass = p[ind];
             if ($.inArray(pass.name, champ.internal.passives) > -1 && pass.unique) {
+                champ.internal.passive_calc = false;
                 return;
             }
             else {
@@ -603,21 +604,22 @@ var compute_item_passive = function(id, champ, slot) {
             }
         }
     }
-    else if(inprog[id] == undefined){
-        inprog[id] = true;
-        $.getJSON( "data/items/" + id + ".json", function( data ) {
-            console.log(data)
-            calc.item_json[id] = data;
-            passives[id] = data.passives;
-            inprog[id] = undefined;
-            calc.apply()
-        }).fail(function(){
-            passives[id] = null;
-            inprog[id] = undefined;
-        });
-    }
-    else{
-        console.log("here");
+    else {
+        $.ajax({
+            method: "GET",
+            url: "data/items/" + id + ".json",
+            data: {"champData": "all"},
+            async: 'true'
+        }).done(
+            function (data) {
+                calc.item_json[id] = data;
+                passives[id] = data.passives;
+                calc.apply()
+            }
+        ).fail(function (error) {
+                passives[id] = null;
+                console.log(error)
+            });
     }
     champ.internal.passive_calc = false;
 }
