@@ -1,0 +1,13 @@
+{
+  "passives": [
+    {
+      "unique": true,
+      "code": [
+        "return function(champion){",
+        "champion.mult.hpRegen *= 1.2",
+        "}"
+      ],
+      "name": "spiritvisagepass"
+    }
+  ]
+}
