@@ -1019,7 +1019,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         {code: "euw", name: "EU West"},
         {code: "kr", name: "Korea"},
         {code: "lan", name: "Latin America North"},
-        {code: "lac", name: "Latin America South"},
+        {code: "las", name: "Latin America South"},
         {code: "na", name: "North America"},
         {code: "oce", name: "Oceana"},
         {code: "pbe", name: "Public Beta Environment"},
