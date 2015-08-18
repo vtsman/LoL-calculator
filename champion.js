@@ -148,7 +148,7 @@ calculateRunes = function(self){
                 case "PercentMovementSpeedMod": self.mult.speed *= 1 + rune.stats[key]; break;
                 case "rFlatArmorModPerLevel": self.add.mr += rune.stats[key] * (self.level + 1); break;
                 case "FlatHPRegenMod": self.add.hpRegen *= 1 + rune.stats[key]; break;
-                case "rPercentCooldownModPerLevel": self.cd *= 1 - rune.stats[key] * (self.level + 1); break;
+                case "rPercentCooldownModPerLevel": self.cd += rune.stats[key] * (self.level + 1); break;
                 case "rFlatMPRegenModPerLevel": self.add.manaRegen += rune.stats[key] * (self.level + 1); break;
                 case "rFlatHPRegenModPerLevel": self.add.hpRegen += rune.stats[key] * (self.level + 1); break;
                 case "rPercentTimeDeadMod": break; //TODO implement
