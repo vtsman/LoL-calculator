@@ -316,7 +316,11 @@ Champion.prototype.getBaseAttackSpeed = function(){
 
 Champion.prototype.getAttackSpeed = function(){
 this.calculateBuild();
-    return (this.getBaseAttackSpeed() + this.add.attackSpeed) * this.mult.attackSpeed
+    var out = (this.getBaseAttackSpeed() + this.add.attackSpeed) * this.mult.attackSpeed
+    if(out > 2.5){
+        return 2.5;
+    }
+    return out;
 }
 
 Champion.prototype.getBaseCritChance = function(){
@@ -325,7 +329,11 @@ Champion.prototype.getBaseCritChance = function(){
 
 Champion.prototype.getCritChance = function(){
 this.calculateBuild();
-    return (this.getBaseCritChance() + this.add.critChance) * this.mult.critChance;
+    var out = (this.getBaseCritChance() + this.add.critChance) * this.mult.critChance;
+    if(out > 1){
+        return 1;
+    }
+    return out;
 }
 
 Champion.prototype.getBaseHP = function(){
