@@ -30,7 +30,7 @@
                             <div class="lol_title" id="champion_title">{{ calculator.getChampion().base.name }}</div>
                             <div class="lol_subtitle" id="champion_subtitle">{{ calculator.getChampion().base.title }}</div>
                         </div>
-                        <div id="champ_popup_wrapper" ng-if="!calculator.isMobile()">
+                        <div id="champ_popup_wrapper" ng-if="!calculator.isMobile()" ng-mouseleave="calculator.setChampHover(undefined)">
                             <div id="champion_popup" class="popup light_blur" ng-hide="!calculator.should_show_champion_popup()">
                                 <input type="text" id="champion_search" class="search" placeholder="search" ng-model="search.champ" ng-change="calculator.update_champion_search()" align="center" spellcheck="false">
                                 <div id="tbl" class="scroll" align="center">

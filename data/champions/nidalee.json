@@ -26,6 +26,48 @@
       "use": [
 
       ]
+    },
+    {
+      "vars":{
+        "f3": [
+          "return function(champ){return champ.getAD() * .75}"
+        ],
+        "f2": [
+          "return function(champ){switch(champ.getAbilityLevel(3)){case 0: return 0; case 1: return 4; case 2: return 20; case 3: return 50; case 4: return 90;}}"
+        ],
+        "f1": [
+          "return function(champ){return champ.getAD() * 1.875}"
+        ],
+        "f4": [
+          "return function(champ){switch(champ.getAbilityLevel(3)){case 0: return 0; case 1: return 10; case 2: return 50; case 3: return 125; case 4: return 225;}}"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champ){return champ.getAbilityLevel(3) * 50}"
+        ],
+        "f2": [
+          "return function(){return 1.5}"
+        ]
+      },
+      "use": [
+
+      ]
+    },
+    {
+      "vars":{
+        "f1": [
+          "return function(champ){return champ.getAbilityLevel(3) * 60 + 10}"
+        ]
+      },
+      "use": [
+
+      ]
     }
   ]
 }

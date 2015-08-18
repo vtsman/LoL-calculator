@@ -220,6 +220,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         loadChamp(champ.id)
         $("#champion_search")[0].value = ""
         calculator.update_champion_search();
+        calculator.setChampHover(undefined);
         popup_active = -1;
     }
 
@@ -461,6 +462,7 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             $("#item_button" + clicked).removeClass("selected");
             calculator.active_item = -1;
         }
+        calculator.setItemHover(-1)
     }
 
     calculator.set_level = function(){
