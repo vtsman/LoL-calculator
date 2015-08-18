@@ -439,6 +439,22 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }
     }
 
+    calculator.makeSpellOptions = function(len){
+        var out = [];
+        out.push("Not leveled");
+        for(var i = 0; i < len; i++){
+            out.push("Level " + i);
+        }
+        return out;
+    }
+
+    calculator.getSpellLvlKey = function(spell, index){
+        if(calculator.getChampion().supp_json.abilities[index].sync != undefined){
+            return calculator.getChampion().supp_json.abilities[index].sync;
+        }
+        return spell.key;
+    }
+
     calculator.removeRune = function(index){
         calculator.getChampion().state.runes[index] = -1;
         calculator.setRuneHover(-1);
