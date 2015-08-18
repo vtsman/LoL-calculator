@@ -107,6 +107,7 @@ Champion.prototype.resetStats = function () {
 }
 
 Champion.prototype.calculateBuild = function(){
+    balanceLevels();
     this.resetStats()
     calculateRunes(this);
     calculateItems(this);
@@ -622,4 +623,14 @@ var compute_item_passive = function(id, champ, slot) {
             });
     }
     champ.internal.passive_calc = false;
+}
+
+var balanceLevels = function(){
+    /*spell = this.base.spells[index]
+    lvl = 0;
+    if($("#ability_level_" + spell.key)[0]!= undefined){
+        lvl = parseInt($("#ability_level_" + spell.key)[0].value);
+    }
+    return lvl;*/
+
 }

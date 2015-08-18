@@ -152,13 +152,13 @@
                         <table id="build_items_table">
                             <tr>
                                 <td ng-repeat="item in calculator.getChampion().getItems().slice(0, 3) track by $index">
-                                    <img ng-if="item != 0" class="item enabled clickable" id="{{'item_img'+$index}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.item_clicked($event)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
+                                    <img ng-if="item != 0" class="item enabled clickable" id="{{'item_img'+$index}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" onerror="this.src='notfound.png'" ng-right-click="calculator.removeItem($index)" class="lol_icon item clickable" ng-click="calculator.item_clicked($event)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
                                     <div class="blank_item blur clickable" id="{{'item_button'+$index}}" ng-click="calculator.item_clicked($event)"></div>
                                 </td>
                             </tr>
                             <tr>
                                 <td ng-repeat="item in calculator.getChampion().getItems().slice(3, 7) track by $index">
-                                    <img ng-if="item != 0" class="item enabled clickable" id="{{'item_img'+($index + 3)}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.item_clicked($event)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
+                                    <img ng-if="item != 0" class="item enabled clickable" id="{{'item_img'+($index + 3)}}" src="{{ calculator.getImage(calculator.items.data[item].image) }}" ng-right-click="calculator.removeItem($index + 3)" onerror="this.src='notfound.png'" class="lol_icon item clickable" ng-click="calculator.item_clicked($event)" ng-mouseenter="calculator.setItemHover(item)" ng-mouseleave="calculator.setItemHover(-1)">
                                     <div class="blank_item blur clickable" id="{{'item_button'+($index + 3)}}" ng-click="calculator.item_clicked($event)"></div>
                                 </td>
                             </tr>
@@ -216,7 +216,7 @@
                                     &#x2b22;
                                 </div>
                                 <div ng-if="rune != -1">
-                                    <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)" id="{{$index > 26 ? 'quint_icon':'rune_icon'}}">
+                                    <img src="{{ calculator.getImage(calculator.runes.data[rune].image) }}" onerror="this.src='notfound.png'" ng-mouseenter="calculator.setRuneHover(rune)" ng-mouseleave="calculator.setRuneHover(-1)" id="{{$index > 26 ? 'quint_icon':'rune_icon'}}" ng-right-click="calculator.removeRune($index)">
                                 </div>
                             </div>
                         </div>

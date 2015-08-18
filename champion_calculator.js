@@ -439,6 +439,16 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
         }
     }
 
+    calculator.removeRune = function(index){
+        calculator.getChampion().state.runes[index] = -1;
+        calculator.setRuneHover(-1);
+    }
+
+    calculator.removeItem = function(index){
+        calculator.getChampion().state.items[index] = 0;
+        calculator.setItemHover(-1);
+    }
+
     calculator.get_points_used = function(){
         var ability_levels = 0;
         $(".ability_level").each(function(index, level){ability_levels += parseInt(level.value) + 1})
