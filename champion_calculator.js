@@ -218,6 +218,8 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
 
     calculator.switchChamp = function(champ){
         loadChamp(champ.id)
+        $("#champion_search")[0].value = ""
+        calculator.update_champion_search();
         popup_active = -1;
     }
 
@@ -554,6 +556,8 @@ app.controller('CalculatorController', ['$scope', '$sce', function($scope, $sce)
             }
         }
         $("#item_button" + calculator.active_item).removeClass("selected");
+        $("#item_search")[0].value = "";
+        calculator.update_search()
         calculator.active_item = -1
     }
 
